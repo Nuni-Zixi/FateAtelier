@@ -11,6 +11,7 @@ import Favorites from './components/Favorites'
 import CardDrawAnimation from './components/CardDrawAnimation'
 import ThreeCardDrawAnimation from './components/ThreeCardDrawAnimation'
 import ReadingTypeSelector from './components/ReadingTypeSelector'
+import NameGenerator from './components/NameGenerator'
 import { getCardIcon, getSuitIcon } from './utils/cardIcons'
 import { generateThreeCardReading } from './utils/readingInterpretation'
 import { downloadReading } from './utils/exportReading'
@@ -33,6 +34,7 @@ function App() {
   const [showReadingTypeSelector, setShowReadingTypeSelector] = useState(false)
   const [selectedReadingType, setSelectedReadingType] = useState<ReadingType>('general')
   const [customQuestion, setCustomQuestion] = useState<string | undefined>(undefined)
+  const [currentPage, setCurrentPage] = useState<'tarot' | 'name'>('tarot')
 
   // 从localStorage加载历史记录
   useEffect(() => {
@@ -247,15 +249,37 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1>🔮 命运工坊</h1>
-        <p className="subtitle">探索塔罗牌的奥秘</p>
-        <div className="header-actions">
-          <CardBrowser onSelectCard={handleSelectCardFromBrowser} />
-          <Favorites onSelectCard={handleSelectCardFromBrowser} />
-          <HelpGuide />
+        <p className="subtitle">
+          {currentPage === 'tarot' ? '探索塔罗牌的奥秘' : '智能取名服务'}
+        </p>
+        <div className="header-nav">
+          <button
+            className={`nav-btn ${currentPage === 'tarot' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('tarot')}
+          >
+            🔮 塔罗占卜
+          </button>
+          <button
+            className={`nav-btn ${currentPage === 'name' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('name')}
+          >
+            ✨ 智能取名
+          </button>
         </div>
+        {currentPage === 'tarot' && (
+          <div className="header-actions">
+            <CardBrowser onSelectCard={handleSelectCardFromBrowser} />
+            <Favorites onSelectCard={handleSelectCardFromBrowser} />
+            <HelpGuide />
+          </div>
+        )}
       </header>
 
       <main className="app-main">
+        {currentPage === 'name' ? (
+          <NameGenerator onBack={() => setCurrentPage('tarot')} />
+        ) : (
+          <>
         {/* 单张牌抽牌动画 */}
         {showDrawAnimation && drawingCard && (
           <CardDrawAnimation
@@ -439,6 +463,8 @@ function App() {
 
         {/* 统计信息 */}
         <Statistics readings={readingHistory} />
+          </>
+        )}
       </main>
 
       <footer className="app-footer">
