@@ -5,9 +5,12 @@ import CardDrawer from './components/CardDrawer'
 import CardBrowser from './components/CardBrowser'
 import ReadingHistory, { ReadingRecord } from './components/ReadingHistory'
 import HelpGuide from './components/HelpGuide'
+import DailyCard from './components/DailyCard'
+import Statistics from './components/Statistics'
 import { getCardIcon, getSuitIcon } from './utils/cardIcons'
 import { generateThreeCardReading } from './utils/readingInterpretation'
 import { downloadReading } from './utils/exportReading'
+import { shareReading } from './utils/shareReading'
 import { DrawnCard } from './types'
 import './App.css'
 
@@ -166,6 +169,10 @@ function App() {
     downloadReading(reading)
   }
 
+  const handleShareReading = async (reading: ReadingRecord) => {
+    await shareReading(reading)
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -178,6 +185,9 @@ function App() {
       </header>
 
       <main className="app-main">
+        {/* 每日一牌 */}
+        <DailyCard onSelectCard={handleSelectCardFromBrowser} />
+
         <div className="controls">
           <CardDrawer
             onDrawCard={drawCard}
@@ -213,13 +223,22 @@ function App() {
                 <div className="interpretation-header">
                   <h3 className="interpretation-title">🔮 综合解读</h3>
                   {viewingHistoryReading && (
-                    <button 
-                      className="export-btn"
-                      onClick={() => handleExportReading(viewingHistoryReading)}
-                      title="导出占卜结果"
-                    >
-                      💾 导出
-                    </button>
+                    <div className="action-buttons">
+                      <button 
+                        className="export-btn"
+                        onClick={() => handleExportReading(viewingHistoryReading)}
+                        title="导出占卜结果"
+                      >
+                        💾 导出
+                      </button>
+                      <button 
+                        className="share-btn"
+                        onClick={() => handleShareReading(viewingHistoryReading)}
+                        title="分享占卜结果"
+                      >
+                        📤 分享
+                      </button>
+                    </div>
                   )}
                 </div>
                 <div className="interpretation-content">
@@ -262,7 +281,13 @@ function App() {
                   className="export-btn"
                   onClick={() => handleExportReading(viewingHistoryReading)}
                 >
-                  💾 导出占卜结果
+                  💾 导出
+                </button>
+                <button 
+                  className="share-btn"
+                  onClick={() => handleShareReading(viewingHistoryReading)}
+                >
+                  📤 分享
                 </button>
               </div>
             )}
@@ -314,10 +339,19 @@ function App() {
           onViewReading={handleViewHistoryReading}
           onDeleteReading={handleDeleteHistoryReading}
         />
+
+        {/* 统计信息 */}
+        <Statistics readings={readingHistory} />
       </main>
 
       <footer className="app-footer">
-        <p>© 2024 命运工坊 - 仅供娱乐参考</p>
+        <div className="footer-content">
+          <p className="footer-copyright">© 2024 命运工坊 - 仅供娱乐参考</p>
+          <div className="footer-team">
+            <p className="team-label">Made with ❤️ by</p>
+            <p className="team-name">默默团队</p>
+          </div>
+        </div>
       </footer>
     </div>
   )
