@@ -10,12 +10,14 @@ import Statistics from './components/Statistics'
 import Favorites from './components/Favorites'
 import CardDrawAnimation from './components/CardDrawAnimation'
 import ThreeCardDrawAnimation from './components/ThreeCardDrawAnimation'
+import ReadingTypeSelector from './components/ReadingTypeSelector'
 import { getCardIcon, getSuitIcon } from './utils/cardIcons'
 import { generateThreeCardReading } from './utils/readingInterpretation'
 import { downloadReading } from './utils/exportReading'
 import { shareReading } from './utils/shareReading'
 import { downloadAllData } from './utils/exportData'
 import { DrawnCard } from './types'
+import { ReadingType } from './types/reading'
 import './App.css'
 
 function App() {
@@ -28,6 +30,9 @@ function App() {
   const [showDrawAnimation, setShowDrawAnimation] = useState(false)
   const [drawingThreeCards, setDrawingThreeCards] = useState<Array<{ card: TarotCard, isReversed: boolean }> | null>(null)
   const [showThreeCardAnimation, setShowThreeCardAnimation] = useState(false)
+  const [showReadingTypeSelector, setShowReadingTypeSelector] = useState(false)
+  const [selectedReadingType, setSelectedReadingType] = useState<ReadingType>('general')
+  const [customQuestion, setCustomQuestion] = useState<string | undefined>(undefined)
 
   // 从localStorage加载历史记录
   useEffect(() => {
@@ -51,10 +56,13 @@ function App() {
   // 生成三牌占卜的综合解读
   const readingInterpretation = useMemo(() => {
     if (threeCardReading && threeCardReading.length === 3) {
-      return generateThreeCardReading(threeCardReading)
+      // 从当前查看的历史记录或状态中获取占卜类型
+      const readingType = (viewingHistoryReading?.readingType as ReadingType) || selectedReadingType
+      const question = viewingHistoryReading?.customQuestion || customQuestion
+      return generateThreeCardReading(threeCardReading, readingType, question)
     }
     return null
-  }, [threeCardReading])
+  }, [threeCardReading, selectedReadingType, customQuestion, viewingHistoryReading])
 
   const drawCard = () => {
     if (drawnCards.length >= 78) {
@@ -65,6 +73,12 @@ function App() {
     const availableCards = tarotCards.filter(
       card => !drawnCards.some((drawn: DrawnCard) => drawn.card.id === card.id)
     )
+    
+    if (availableCards.length === 0) {
+      alert('没有可用的牌了！')
+      return
+    }
+    
     const randomIndex = Math.floor(Math.random() * availableCards.length)
     const card = availableCards[randomIndex]
     const reversed = Math.random() < 0.5
@@ -101,7 +115,16 @@ function App() {
       alert('剩余的牌不足以抽取三张！')
       return
     }
+    // 先显示占卜类型选择器
+    setShowReadingTypeSelector(true)
+  }
 
+  const handleReadingTypeSelected = (type: ReadingType, question?: string) => {
+    setSelectedReadingType(type)
+    setCustomQuestion(question)
+    setShowReadingTypeSelector(false)
+
+    // 开始抽牌
     const availableCards = tarotCards.filter(
       card => !drawnCards.some((drawn: DrawnCard) => drawn.card.id === card.id)
     )
@@ -134,13 +157,15 @@ function App() {
       setSelectedCard(null) // 清除单张牌显示
 
       // 生成解读并保存到历史记录
-      const interpretation = generateThreeCardReading(threeDrawnCards)
+      const interpretation = generateThreeCardReading(threeDrawnCards, selectedReadingType, customQuestion)
       const historyRecord: ReadingRecord = {
         id: Date.now().toString(),
         type: 'three',
         cards: threeDrawnCards,
         timestamp: Date.now(),
-        interpretation
+        interpretation,
+        readingType: selectedReadingType,
+        customQuestion: customQuestion
       }
       setReadingHistory([historyRecord, ...readingHistory])
       
@@ -154,6 +179,9 @@ function App() {
     setSelectedCard(null)
     setThreeCardReading(null)
     setViewingHistoryReading(null)
+    setShowReadingTypeSelector(false)
+    setSelectedReadingType('general')
+    setCustomQuestion(undefined)
   }
 
   const selectCard = (drawnCard: DrawnCard) => {
@@ -189,6 +217,13 @@ function App() {
     } else {
       setThreeCardReading(reading.cards)
       setSelectedCard(null)
+      // 恢复占卜类型
+      if (reading.readingType) {
+        setSelectedReadingType(reading.readingType as ReadingType)
+      }
+      if (reading.customQuestion) {
+        setCustomQuestion(reading.customQuestion)
+      }
     }
     // 滚动到顶部
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -227,6 +262,14 @@ function App() {
             card={drawingCard.card}
             isReversed={drawingCard.isReversed}
             onComplete={handleDrawAnimationComplete}
+          />
+        )}
+
+        {/* 占卜类型选择器 */}
+        {showReadingTypeSelector && (
+          <ReadingTypeSelector
+            onSelect={handleReadingTypeSelected}
+            onCancel={() => setShowReadingTypeSelector(false)}
           />
         )}
 

@@ -16,6 +16,8 @@ export interface ReadingRecord {
   cards: DrawnCard[]
   timestamp: number
   interpretation?: ReturnType<typeof generateThreeCardReading>
+  readingType?: string
+  customQuestion?: string
 }
 
 function ReadingHistory({ readings, onViewReading, onDeleteReading, onExportAll }: ReadingHistoryProps) {
@@ -82,9 +84,24 @@ function ReadingHistory({ readings, onViewReading, onDeleteReading, onExportAll 
           <div key={reading.id} className="history-item">
             <div className="history-header">
               <div className="history-info">
-                <span className="history-type">
-                  {reading.type === 'single' ? '🎴 单牌' : '🔮 三牌占卜'}
-                </span>
+                <div className="history-type-row">
+                  <span className="history-type">
+                    {reading.type === 'single' ? '🎴 单牌' : '🔮 三牌占卜'}
+                  </span>
+                  {reading.readingType && reading.type === 'three' && (
+                    <span className="history-reading-type">
+                      {reading.readingType === 'daily' && '🌟 今日运势'}
+                      {reading.readingType === 'love' && '💕 姻缘感情'}
+                      {reading.readingType === 'wealth' && '💰 钱财财运'}
+                      {reading.readingType === 'career' && '💼 职场事业'}
+                      {reading.readingType === 'health' && '🌿 健康'}
+                      {reading.readingType === 'study' && '📚 学业'}
+                      {reading.readingType === 'relationship' && '🤝 人际关系'}
+                      {reading.readingType === 'custom' && `✨ ${reading.customQuestion || '自定义'}`}
+                      {reading.readingType === 'general' && '🔮 综合占卜'}
+                    </span>
+                  )}
+                </div>
                 <span className="history-date">{formatDate(reading.timestamp)}</span>
               </div>
               <div className="history-actions">

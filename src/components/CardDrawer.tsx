@@ -22,7 +22,10 @@ function CardDrawer({ onDrawCard, onDrawThree, onReset, drawnCount }: CardDrawer
           🔮 三牌占卜
         </button>
         {drawnCount > 0 && (
-          <button className="draw-button reset" onClick={onReset}>
+          <button 
+            className="draw-button reset" 
+            onClick={onReset}
+          >
             🔄 重新开始
           </button>
         )}
