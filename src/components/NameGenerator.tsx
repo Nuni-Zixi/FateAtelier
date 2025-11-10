@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import './NameGenerator.css'
 
 interface NameGeneratorProps {
@@ -14,6 +14,12 @@ function NameGenerator({ onBack }: NameGeneratorProps) {
   const [nameLength, setNameLength] = useState<'any' | '2' | '3' | '4'>('any')
   const [generatedNames, setGeneratedNames] = useState<string[]>([])
   const [isGenerating, setIsGenerating] = useState(false)
+  // 默认使用提供的Gemini API Key
+  const apiKey = 'AIzaSyB0wjOKKOdLVoyAlRmJDWjqUFcCX0eM2oA'
+  
+  // 防止重复请求
+  const lastRequestTime = useRef<number>(0)
+  const REQUEST_COOLDOWN = 2000 // 2秒内不允许重复请求
 
   const preferenceOptions = [
     '文雅', '活泼', '沉稳', '清新', '古典', '现代', '诗意', '简洁',
@@ -28,20 +34,188 @@ function NameGenerator({ onBack }: NameGeneratorProps) {
     )
   }
 
-  const generateNames = () => {
+  // 调用Gemini API生成名字（带重试机制）
+  const generateNamesWithGemini = async (prompt: string, surnameForMatch: string, retries: number = 2): Promise<string[]> => {
+    // 构建完整的提示词，包含系统指令
+    const fullPrompt = `你是一个专业的中文起名专家，擅长根据用户需求生成优雅、自然、符合中文命名习惯的名字。请只返回名字列表，每行一个名字，不要添加任何解释或其他文字。\n\n${prompt}`
+    
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{
+                  text: fullPrompt
+                }]
+              }],
+              generationConfig: {
+                temperature: 0.8,
+                maxOutputTokens: 500
+              }
+            })
+          }
+        )
+
+        if (!response.ok) {
+          // 429错误（请求过多）或500错误，可以重试
+          if ((response.status === 429 || response.status >= 500) && attempt < retries) {
+            // 检查响应头中的Retry-After
+            const retryAfter = response.headers.get('Retry-After')
+            let delay = 5000 // 默认5秒
+            
+            if (retryAfter) {
+              delay = parseInt(retryAfter) * 1000 // 转换为毫秒
+            } else {
+              // 指数退避：第一次重试5秒，第二次10秒
+              delay = 5000 * attempt
+            }
+            
+            // 429错误时等待更长时间，最多30秒
+            delay = Math.min(delay, 30000)
+            await new Promise(resolve => setTimeout(resolve, delay))
+            continue // 重试
+          }
+          
+          // 其他错误或重试次数用完，抛出错误
+          const errorText = response.status === 429 
+            ? '请求过于频繁，请稍后再试（已自动使用本地生成）' 
+            : response.status === 400
+            ? '请求参数错误'
+            : response.status === 401
+            ? 'API密钥无效'
+            : response.status === 403
+            ? 'API访问被拒绝'
+            : `API请求失败 (${response.status})`
+          throw new Error(errorText)
+        }
+
+        const data = await response.json()
+        const content = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+        
+        // 解析返回的名字列表
+        const names = content
+          .split('\n')
+          .map((line: string) => line.trim())
+          .filter((line: string) => {
+            // 提取名字（去除序号、标点等），动态匹配姓氏
+            const surnamePattern = surnameForMatch.length > 0 ? surnameForMatch[0] : '[\\u4e00-\\u9fa5]'
+            const match = line.match(new RegExp(`${surnamePattern}[\\u4e00-\\u9fa5]{1,3}`))
+            return match ? match[0] : null
+          })
+          .filter((name: string | null): name is string => name !== null)
+          .filter((name: string, index: number, self: string[]) => self.indexOf(name) === index) // 去重
+          .slice(0, 10) // 最多10个
+
+        return names.length > 0 ? names : []
+      } catch (error) {
+        // 最后一次尝试失败，抛出错误
+        if (attempt === retries) {
+          console.error('Gemini API调用失败:', error)
+          throw error
+        }
+        // 否则继续重试
+      }
+    }
+    
+    return [] // 理论上不会到达这里
+  }
+
+  const generateNames = async () => {
     if (!surname.trim()) {
       alert('请输入姓氏')
       return
     }
 
+    // 防止重复请求：检查距离上次请求的时间
+    const now = Date.now()
+    if (now - lastRequestTime.current < REQUEST_COOLDOWN) {
+      const remainingTime = Math.ceil((REQUEST_COOLDOWN - (now - lastRequestTime.current)) / 1000)
+      alert(`请稍候 ${remainingTime} 秒后再试，避免请求过于频繁`)
+      return
+    }
+    
+    lastRequestTime.current = now
     setIsGenerating(true)
     
-    // 模拟生成过程
-    setTimeout(() => {
-      const names = generateNameList(surname, gender, birthDate, birthTime, preferences, nameLength)
+    try {
+      let names: string[] = []
+
+      // 优先使用Gemini生成
+      try {
+        // 计算生辰八字
+        const bazi = calculateBazi(birthDate, birthTime)
+        const wuxingCount = analyzeWuxing(bazi)
+        
+        // 构建prompt
+        let prompt = `请为姓氏"${surname}"生成${nameLength === 'any' ? '任意长度' : nameLength === '2' ? '两个字' : nameLength === '3' ? '三个字' : '四个字'}的中文名字，要求：\n`
+        
+        if (gender === 'male') {
+          prompt += '- 性别：男\n'
+        } else if (gender === 'female') {
+          prompt += '- 性别：女\n'
+        } else {
+          prompt += '- 性别：不限\n'
+        }
+
+        if (birthDate) {
+          prompt += `- 出生日期：${birthDate}\n`
+          if (bazi.length > 0) {
+            prompt += `- 生辰八字：${bazi.join(' ')}\n`
+            const wuxingInfo = Object.entries(wuxingCount)
+              .map(([wuxing, count]) => `${wuxing}:${count}`)
+              .join(' ')
+            prompt += `- 五行分布：${wuxingInfo}\n`
+            const neededWuxing = Object.entries(wuxingCount)
+              .filter(([_, count]) => count < Object.values(wuxingCount).reduce((a, b) => a + b, 0) / 5)
+              .map(([wuxing]) => wuxing)
+            if (neededWuxing.length > 0) {
+              prompt += `- 建议补充的五行：${neededWuxing.join('、')}\n`
+            }
+          }
+        }
+
+        if (birthTime) {
+          prompt += `- 出生时间：${birthTime}\n`
+        }
+
+        if (preferences.length > 0) {
+          prompt += `- 个人偏好：${preferences.join('、')}\n`
+        }
+
+        prompt += `\n请生成10个优雅、自然、符合中文命名习惯的名字，每个名字都要好听、有意义。只返回名字，每行一个，格式如：${surname}XX。`
+
+        names = await generateNamesWithGemini(prompt, surname)
+        
+        // 如果Gemini生成失败或数量不足，使用本地生成补充
+        if (names.length < 10) {
+          const localNames = generateNameList(surname, gender, birthDate, birthTime, preferences, nameLength)
+          names = [...names, ...localNames].slice(0, 10)
+        }
+      } catch (geminiError: any) {
+        console.error('Gemini生成失败，使用本地生成:', geminiError)
+        // 如果Gemini调用失败，使用本地生成
+        names = generateNameList(surname, gender, birthDate, birthTime, preferences, nameLength)
+        // 只在非429错误时显示提示（429错误会自动重试，如果最终失败说明确实请求过多）
+        if (geminiError?.message && !geminiError.message.includes('请求过于频繁')) {
+          // 静默失败，自动使用本地生成，不打扰用户
+        }
+      }
+
       setGeneratedNames(names)
+    } catch (error) {
+      console.error('生成名字失败:', error)
+      // 最终回退到本地生成
+      const localNames = generateNameList(surname, gender, birthDate, birthTime, preferences, nameLength)
+      setGeneratedNames(localNames)
+    } finally {
       setIsGenerating(false)
-    }, 1000)
+    }
   }
 
   // 天干地支
@@ -901,7 +1075,7 @@ function NameGenerator({ onBack }: NameGeneratorProps) {
             onClick={generateNames}
             disabled={!surname.trim() || isGenerating}
           >
-            {isGenerating ? '生成中...' : '✨ 开始生成名字'}
+            {isGenerating ? '生成中...' : '🤖 智能生成名字'}
           </button>
         </div>
 
