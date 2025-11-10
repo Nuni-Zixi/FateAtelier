@@ -293,19 +293,61 @@
   box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
 }
 
+/* 平板设备 (768px - 1024px) */
 @media (max-width: 1024px) {
-  .name-generator-content {
+  .name-generator-content.has-results {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .name-generator-header {
+    margin-bottom: 2rem;
+  }
+
+  .name-generator-header h1 {
+    font-size: 2.2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .input-section {
+    max-width: 100%;
+  }
+
+  .names-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   }
 }
 
+/* 平板竖屏和小屏平板 (600px - 768px) */
 @media (max-width: 768px) {
   .name-generator-page {
-    padding: 1.5rem;
+    padding: 1.5rem 1rem;
+  }
+
+  .name-generator-header {
+    margin-bottom: 1.5rem;
   }
 
   .name-generator-header h1 {
     font-size: 2rem;
+    margin: 0.5rem 0;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .back-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    left: -0.5rem;
+  }
+
+  .name-generator-content {
+    gap: 1.5rem;
   }
 
   .input-section,
@@ -313,8 +355,57 @@
     padding: 1.5rem;
   }
 
+  .input-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .input-group label {
+    font-size: 0.95rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .name-input {
+    padding: 0.75rem;
+    font-size: 0.95rem;
+  }
+
   .gender-buttons {
-    flex-direction: column;
+    flex-direction: row;
+    gap: 0.75rem;
+  }
+
+  .gender-btn {
+    padding: 0.75rem;
+    font-size: 0.95rem;
+  }
+
+  .length-buttons {
+    gap: 0.75rem;
+  }
+
+  .length-btn {
+    min-width: 80px;
+    padding: 0.75rem 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .preference-tags {
+    gap: 0.6rem;
+  }
+
+  .preference-tag {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .generate-btn {
+    padding: 0.9rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .results-section h2 {
+    font-size: 1.6rem;
+    margin-bottom: 1.2rem;
   }
 
   .names-grid {
@@ -324,35 +415,247 @@
 
   .name-card {
     padding: 1rem;
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .name-text {
     font-size: 1.1rem;
   }
+
+  .copy-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
 }
 
-@media (max-width: 480px) {
+/* 手机设备 (480px - 600px) */
+@media (max-width: 600px) {
   .name-generator-page {
-    padding: 1rem;
+    padding: 1rem 0.75rem;
+  }
+
+  .name-generator-header {
+    margin-bottom: 1.2rem;
   }
 
   .name-generator-header h1 {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
   }
 
   .back-button {
     position: relative;
+    left: 0;
     margin-bottom: 1rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  .input-section,
+  .results-section {
+    padding: 1.2rem;
+  }
+
+  .input-group {
+    margin-bottom: 1.2rem;
+  }
+
+  .gender-buttons {
+    flex-direction: column;
+  }
+
+  .gender-btn {
+    width: 100%;
+  }
+
+  .length-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+  }
+
+  .length-btn {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .preference-tags {
+    gap: 0.5rem;
+  }
+
+  .preference-tag {
+    padding: 0.45rem 0.9rem;
+    font-size: 0.8rem;
+  }
+
+  .names-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+  }
+
+  .name-card {
+    padding: 0.9rem;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .name-text {
+    font-size: 1rem;
+  }
+
+  .copy-btn {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* 小屏手机 (320px - 480px) */
+@media (max-width: 480px) {
+  .name-generator-page {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .name-generator-header {
+    margin-bottom: 1rem;
+  }
+
+  .name-generator-header h1 {
+    font-size: 1.5rem;
+    margin: 0.3rem 0;
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+  }
+
+  .back-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .name-generator-content {
+    gap: 1rem;
   }
 
   .input-section,
   .results-section {
     padding: 1rem;
+    border-radius: 15px;
+  }
+
+  .input-group {
+    margin-bottom: 1rem;
+  }
+
+  .input-group label {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .name-input {
+    padding: 0.7rem;
+    font-size: 0.9rem;
+    border-radius: 12px;
+  }
+
+  .gender-btn {
+    padding: 0.7rem;
+    font-size: 0.9rem;
+  }
+
+  .length-buttons {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .length-btn {
+    padding: 0.7rem 0.4rem;
+    font-size: 0.85rem;
+    border-radius: 12px;
+  }
+
+  .preference-tags {
+    gap: 0.4rem;
+  }
+
+  .preference-tag {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+    border-radius: 15px;
+  }
+
+  .generate-btn {
+    padding: 0.85rem 1.2rem;
+    font-size: 0.95rem;
+    border-radius: 20px;
+    margin-top: 0.75rem;
+  }
+
+  .results-section h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
   }
 
   .names-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .name-card {
+    padding: 0.75rem;
+    border-radius: 12px;
+  }
+
+  .name-text {
+    font-size: 0.95rem;
+  }
+
+  .copy-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+}
+
+/* 超小屏手机 (320px 以下) */
+@media (max-width: 320px) {
+  .name-generator-page {
+    padding: 0.5rem;
+  }
+
+  .name-generator-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+  }
+
+  .input-section,
+  .results-section {
+    padding: 0.75rem;
+  }
+
+  .preference-tags {
+    gap: 0.35rem;
+  }
+
+  .preference-tag {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.7rem;
+  }
+
+  .names-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .name-card {
+    flex-direction: row;
   }
 }
 
