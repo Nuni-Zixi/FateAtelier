@@ -37,6 +37,22 @@ body {
   line-height: 1.6;
   position: relative;
   overflow-x: hidden;
+  /* 优化移动端触摸 */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 13px;
+  }
 }
 
 /* 星空背景效果 */

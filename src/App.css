@@ -160,6 +160,22 @@
   max-width: 320px;
 }
 
+/* 平板优化三牌占卜 */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .three-card-reading {
+    padding: 1.5rem;
+  }
+
+  .three-cards-container {
+    gap: 1.5rem;
+  }
+
+  .three-card-item {
+    min-width: 240px;
+    max-width: 280px;
+  }
+}
+
 .card-position-label {
   font-size: 1.2rem;
   font-weight: 600;
@@ -480,18 +496,68 @@
   letter-spacing: 2px;
 }
 
+/* 平板样式 (768px - 1024px) */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .app {
+    padding: 1.5rem;
+  }
+
+  .app-header h1 {
+    font-size: 3rem;
+  }
+
+  .three-cards-container {
+    gap: 1.5rem;
+  }
+
+  .three-card-item {
+    min-width: 250px;
+    max-width: 300px;
+  }
+
+  .cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  }
+}
+
+/* 手机和平板样式 (≤ 768px) */
 @media (max-width: 768px) {
   .app {
     padding: 1rem;
   }
 
+  .app-header {
+    margin-bottom: 2rem;
+    padding: 1.5rem 0;
+  }
+
+  .app-header::before {
+    font-size: 3rem;
+    top: -0.5rem;
+  }
+
   .app-header h1 {
-    font-size: 2.5rem;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .header-actions {
+    margin-top: 1rem;
+    gap: 0.5rem;
+  }
+
+  .header-actions button {
+    font-size: 0.85rem;
+    padding: 0.6rem 1.2rem;
   }
 
   .cards-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 0.5rem;
   }
 
   .three-cards-container {
@@ -519,6 +585,143 @@
   .reading-interpretation {
     padding: 1.5rem;
     margin-top: 2rem;
+  }
+
+  .drawn-cards {
+    padding: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .drawn-cards h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+
+  .card-thumbnail {
+    padding: 0.75rem;
+  }
+
+  .card-thumbnail-icon {
+    font-size: 1.5rem;
+  }
+
+  .card-thumbnail-name {
+    font-size: 0.8rem;
+  }
+
+  .export-section {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .export-btn,
+  .share-btn {
+    width: 100%;
+    padding: 0.85rem 1.5rem;
+  }
+}
+
+/* 小手机样式 (≤ 480px) */
+@media (max-width: 480px) {
+  .app {
+    padding: 0.75rem;
+  }
+
+  .app-header {
+    margin-bottom: 1.5rem;
+    padding: 1rem 0;
+  }
+
+  .app-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .header-actions button {
+    width: 100%;
+    font-size: 0.8rem;
+    padding: 0.7rem 1rem;
+  }
+
+  .cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .card-thumbnail {
+    padding: 0.5rem;
+  }
+
+  .card-thumbnail-icon {
+    font-size: 1.3rem;
+  }
+
+  .card-thumbnail-name {
+    font-size: 0.75rem;
+  }
+
+  .card-thumbnail-type {
+    font-size: 0.7rem;
+  }
+
+  .drawn-cards {
+    padding: 1rem;
+  }
+
+  .drawn-cards h2 {
+    font-size: 1.2rem;
+  }
+
+  .three-card-reading {
+    padding: 1rem;
+  }
+
+  .reading-title {
+    font-size: 1.3rem;
+  }
+
+  .card-position-label {
+    font-size: 1rem;
+    padding: 0.4rem 1.2rem;
+  }
+
+  .reading-interpretation {
+    padding: 1rem;
+  }
+
+  .interpretation-title {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .interpretation-summary,
+  .stat-detail-card {
+    padding: 1rem;
+  }
+
+  .stage-item {
+    padding: 1rem;
+  }
+
+  .footer-content {
+    gap: 0.75rem;
+  }
+
+  .footer-copyright {
+    font-size: 0.85rem;
+  }
+
+  .team-name {
+    font-size: 1rem;
   }
 }
 

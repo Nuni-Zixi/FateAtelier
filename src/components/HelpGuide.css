@@ -114,14 +114,122 @@
   line-height: 1.6;
 }
 
+/* 平板样式 */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .help-guide {
+    max-width: 90%;
+    padding: 1.75rem;
+  }
+}
+
+/* 手机样式 */
 @media (max-width: 768px) {
+  .help-guide-overlay {
+    padding: 1rem;
+  }
+
   .help-guide {
     padding: 1.5rem;
     max-height: 95vh;
+    max-width: 95%;
+  }
+
+  .help-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
   }
 
   .help-header h2 {
     font-size: 1.5rem;
+  }
+
+  .close-help {
+    width: 35px;
+    height: 35px;
+    font-size: 1.2rem;
+  }
+
+  .help-content {
+    gap: 1.5rem;
+  }
+
+  .help-section {
+    padding: 1.25rem;
+  }
+
+  .help-section h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .help-section p {
+    font-size: 0.95rem;
+  }
+
+  .help-section ul {
+    padding-left: 1.25rem;
+  }
+
+  .help-section li {
+    font-size: 0.95rem;
+    margin-bottom: 0.4rem;
+  }
+}
+
+/* 小手机样式 */
+@media (max-width: 480px) {
+  .help-guide-overlay {
+    padding: 0.5rem;
+  }
+
+  .help-guide {
+    padding: 1rem;
+    max-height: 98vh;
+    max-width: 100%;
+    border-radius: 15px;
+  }
+
+  .help-header {
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .help-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .close-help {
+    width: 32px;
+    height: 32px;
+    font-size: 1.1rem;
+  }
+
+  .help-content {
+    gap: 1.25rem;
+  }
+
+  .help-section {
+    padding: 1rem;
+  }
+
+  .help-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .help-section p {
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+
+  .help-section ul {
+    padding-left: 1rem;
+  }
+
+  .help-section li {
+    font-size: 0.9rem;
+    margin-bottom: 0.35rem;
+    line-height: 1.5;
   }
 }
 

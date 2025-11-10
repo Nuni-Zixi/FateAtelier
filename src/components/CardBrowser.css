@@ -187,9 +187,45 @@
   font-size: 0.9rem;
 }
 
+/* 平板样式 */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .card-browser {
+    padding: 1.5rem;
+  }
+
+  .browser-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+}
+
+/* 手机样式 */
 @media (max-width: 768px) {
   .card-browser {
     padding: 1rem;
+  }
+
+  .browser-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .close-browser {
+    width: 35px;
+    height: 35px;
+    font-size: 1.2rem;
+  }
+
+  .search-input {
+    padding: 0.85rem;
+    font-size: 0.95rem;
+  }
+
+  .filter-buttons {
+    gap: 0.4rem;
+  }
+
+  .filter-btn {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.8rem;
   }
 
   .browser-grid {
@@ -199,6 +235,80 @@
 
   .browser-card {
     padding: 1rem;
+  }
+
+  .browser-card-icon {
+    font-size: 2rem;
+  }
+
+  .browser-card-name {
+    font-size: 0.9rem;
+  }
+
+  .browser-card-name-en {
+    font-size: 0.7rem;
+  }
+}
+
+/* 小手机样式 */
+@media (max-width: 480px) {
+  .card-browser {
+    padding: 0.75rem;
+  }
+
+  .browser-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .browser-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .close-browser {
+    width: 32px;
+    height: 32px;
+    font-size: 1.1rem;
+  }
+
+  .browser-controls {
+    margin-bottom: 1.5rem;
+  }
+
+  .search-input {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .filter-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .browser-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .browser-card {
+    padding: 0.75rem;
+  }
+
+  .browser-card-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .browser-card-name {
+    font-size: 0.85rem;
+  }
+
+  .browser-card-name-en {
+    font-size: 0.65rem;
+  }
+
+  .browser-card-type {
+    font-size: 0.75rem;
   }
 }
 
