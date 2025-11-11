@@ -12,6 +12,7 @@ import CardDrawAnimation from './components/CardDrawAnimation'
 import ThreeCardDrawAnimation from './components/ThreeCardDrawAnimation'
 import ReadingTypeSelector from './components/ReadingTypeSelector'
 import NameGenerator from './components/NameGenerator'
+import Horoscope from './components/Horoscope'
 import { getCardIcon, getSuitIcon } from './utils/cardIcons'
 import { generateThreeCardReading } from './utils/readingInterpretation'
 import { downloadReading } from './utils/exportReading'
@@ -34,7 +35,7 @@ function App() {
   const [showReadingTypeSelector, setShowReadingTypeSelector] = useState(false)
   const [selectedReadingType, setSelectedReadingType] = useState<ReadingType>('general')
   const [customQuestion, setCustomQuestion] = useState<string | undefined>(undefined)
-  const [currentPage, setCurrentPage] = useState<'tarot' | 'name'>('tarot')
+  const [currentPage, setCurrentPage] = useState<'tarot' | 'name' | 'horoscope'>('tarot')
 
   // 从localStorage加载历史记录
   useEffect(() => {
@@ -250,7 +251,7 @@ function App() {
       <header className="app-header">
         <h1>🔮 命运工坊</h1>
         <p className="subtitle">
-          {currentPage === 'tarot' ? '探索塔罗牌的奥秘' : '智能取名服务'}
+          {currentPage === 'tarot' ? '探索塔罗牌的奥秘' : currentPage === 'name' ? '智能取名服务' : '星座运势 · 娱乐参考'}
         </p>
         <div className="header-nav">
           <button
@@ -265,6 +266,12 @@ function App() {
           >
             ✨ 智能取名
           </button>
+          <button
+            className={`nav-btn ${currentPage === 'horoscope' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('horoscope')}
+          >
+            ♈ 星座运势
+          </button>
         </div>
         {currentPage === 'tarot' && (
           <div className="header-actions">
@@ -278,6 +285,8 @@ function App() {
       <main className="app-main">
         {currentPage === 'name' ? (
           <NameGenerator onBack={() => setCurrentPage('tarot')} />
+        ) : currentPage === 'horoscope' ? (
+          <Horoscope onBack={() => setCurrentPage('tarot')} />
         ) : (
           <>
         {/* 单张牌抽牌动画 */}

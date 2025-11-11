@@ -1,0 +1,143 @@
+.horoscope {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.horoscope-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.horoscope-header h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.back-btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #444;
+  background: #222;
+  color: #eee;
+  cursor: pointer;
+}
+.back-btn:hover { background: #2a2a2a; }
+
+.horoscope-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.signs-scroll {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sign-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #3a3a3a;
+  background: #1d1d1d;
+  color: #eaeaea;
+  cursor: pointer;
+}
+.sign-chip.active {
+  border-color: #7c5cff;
+  background: #271f48;
+}
+.sign-icon { font-size: 18px; }
+.sign-name { font-size: 14px; }
+
+.period-toggle {
+  display: inline-flex;
+  border: 1px solid #3a3a3a;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.period-toggle button {
+  padding: 8px 14px;
+  background: #1f1f1f;
+  border: none;
+  color: #ddd;
+  cursor: pointer;
+}
+.period-toggle button.active {
+  background: #6b5cff;
+  color: white;
+}
+
+.horoscope-cards {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.score-card, .info-card, .summary-card, .detail-card, .advice-card {
+  border: 1px solid #363636;
+  background: #181818;
+  border-radius: 14px;
+  padding: 14px;
+}
+.score-card {
+  display: grid;
+  place-items: center;
+}
+.score {
+  font-size: 48px;
+  font-weight: 700;
+  color: #86e1ff;
+}
+.label {
+  margin-top: 6px;
+  color: #aaa;
+}
+.info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  color: #ddd;
+}
+.summary-card h3, .advice-card h3 {
+  margin: 0 0 8px 0;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.detail-key { color: #bbb; }
+.detail-score { color: #ffd166; font-weight: 600; }
+.detail-text { color: #ddd; margin: 0; }
+
+@media (max-width: 768px) {
+  .signs-scroll {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .horoscope-cards {
+    grid-template-columns: 1fr;
+  }
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
