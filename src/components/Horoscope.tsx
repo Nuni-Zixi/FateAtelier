@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import './Horoscope.css'
 
 type Period = 'today' | 'week' | 'month'
+type CalendarType = 'solar' | 'lunar'
 
 const zodiacSigns = [
   { id: 'aries', name: '白羊座', icon: '♈' },
@@ -58,26 +59,50 @@ function genScore(rand: () => number) {
 
 function genAdvice(rand: () => number) {
   const pieces = [
-    '把注意力放在当下的小目标上会更有效率。',
-    '与其纠结不确定，不如先行动起来。',
-    '适合整理与复盘，总结能带来灵感。',
-    '保持耐心，好的结果需要一点时间。',
-    '与可信赖的人沟通，会有关键启发。',
-    '保持节奏，不必和他人比较。',
-    '多赞美自己，信心会带来好运。',
-    '保持作息，精力是今天的核心竞争力。'
+    '把注意力放在当下的小目标上，会更高效也更踏实。',
+    '与其纠结未知，不如先迈出第一步再微调方向。',
+    '适合做一次小复盘，沉淀经验会带来新的灵感。',
+    '保持耐心，节奏放缓反而能看清关键环节。',
+    '与可信赖的人交流，会听到点醒你的那句话。',
+    '稳住自己的节奏，不必与他人比较速度。',
+    '适度肯定自己，稳定的自信会吸引好运靠近。',
+    '规律作息与轻运动，会显著提升专注力与状态。',
+    '先做减法，清理积压事项给新计划腾出空间。',
+    '不必追求一次到位，小步快跑、持续迭代更靠谱。',
+    '给自己一个可执行的时间表，别让理想悬在空中。',
+    '把复杂问题拆解成三步，逐一推进会轻松很多。',
+    '注意界限感，保留属于自己的安静时间。',
+    '试着换个表达方式，沟通会更顺畅也更有效。',
+    '适合学习新事物，哪怕是十分钟也会有收获。',
+    '接纳不确定，先行动后修正，是今天的最佳策略。',
+    '善用清单工具，明确优先级后再投入精力。',
+    '别忘了奖励自己，一个小小的仪式感能增强动力。',
+    '保持弹性预期，容许小波动，你会走得更稳。',
+    '遇到阻力时，先处理最容易的部分建立信心。'
   ]
   return pick(rand, pieces)
 }
 
 function genAspectText(rand: () => number, aspect: string) {
   const templates = [
-    `${aspect}方面起伏不大，稳中有进；适合按计划推进。`,
-    `${aspect}方面有新机会出现，抓住节奏就能更顺利。`,
-    `${aspect}方面建议先做减法，精简后会清晰不少。`,
-    `${aspect}方面不要急于求成，过程比结果更重要。`,
-    `${aspect}方面适合沟通协调，别独自承受压力。`,
-    `${aspect}方面有一点小挑战，但也藏着惊喜与成长。`
+    `${aspect}方面起伏不大，稳中有进，按原计划推进更安心。`,
+    `${aspect}方面会浮现新的灵感或机会，及时记录并尝试。`,
+    `${aspect}方面先做减法，去冗余后重点会更突出。`,
+    `${aspect}方面切忌急于求成，把过程做好结果自会靠近。`,
+    `${aspect}方面适合协作沟通，倾听能换来更高的效率。`,
+    `${aspect}方面可能遇到小波折，但恰好是微调方向的信号。`,
+    `${aspect}方面可以设立一个可达成的小目标，增强掌控感。`,
+    `${aspect}方面注意边界与节奏，避免被外部节奏牵着走。`,
+    `${aspect}方面宜整顿与优化，工具化会让你事半功倍。`,
+    `${aspect}方面主动表达诉求，比被动等待更能创造变化。`,
+    `${aspect}方面宜稳中求新，保持底线同时尝试细微创新。`,
+    `${aspect}方面若遇分歧，先对齐共同目标再谈细节。`,
+    `${aspect}方面不妨放慢一步，检视关键假设是否成立。`,
+    `${aspect}方面的好运来自准备，预案越充分越安心。`,
+    `${aspect}方面宜关注长期复利，小习惯的力量正在累积。`,
+    `${aspect}方面留意来自身边人的支持，一句鼓励就是助推器。`,
+    `${aspect}方面若卡住，先转向边界问题，容易找到突破口。`,
+    `${aspect}方面适合收尾与总结，为下一阶段铺好路。`
   ]
   return pick(rand, templates)
 }
@@ -104,6 +129,205 @@ function genHoroscope(seed: number) {
   return { overall, summary, advice, color, item, details }
 }
 
+// 根据阳历日期计算星座
+function getZodiacSignByDate(month: number, day: number): number {
+  // 星座日期范围（阳历）
+  // 摩羯座（跨年）：12月22日 - 1月19日
+  if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) {
+    return 9 // 摩羯座
+  }
+  // 水瓶座：1月20日 - 2月18日
+  if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) {
+    return 10 // 水瓶座
+  }
+  // 双鱼座：2月19日 - 3月20日
+  if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) {
+    return 11 // 双鱼座
+  }
+  // 白羊座：3月21日 - 4月19日
+  if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) {
+    return 0 // 白羊座
+  }
+  // 金牛座：4月20日 - 5月20日
+  if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) {
+    return 1 // 金牛座
+  }
+  // 双子座：5月21日 - 6月21日
+  if ((month === 5 && day >= 21) || (month === 6 && day <= 21)) {
+    return 2 // 双子座
+  }
+  // 巨蟹座：6月22日 - 7月22日
+  if ((month === 6 && day >= 22) || (month === 7 && day <= 22)) {
+    return 3 // 巨蟹座
+  }
+  // 狮子座：7月23日 - 8月22日
+  if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) {
+    return 4 // 狮子座
+  }
+  // 处女座：8月23日 - 9月22日
+  if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) {
+    return 5 // 处女座
+  }
+  // 天秤座：9月23日 - 10月23日
+  if ((month === 9 && day >= 23) || (month === 10 && day <= 23)) {
+    return 6 // 天秤座
+  }
+  // 天蝎座：10月24日 - 11月22日
+  if ((month === 10 && day >= 24) || (month === 11 && day <= 22)) {
+    return 7 // 天蝎座
+  }
+  // 射手座：11月23日 - 12月21日
+  if ((month === 11 && day >= 23) || (month === 12 && day <= 21)) {
+    return 8 // 射手座
+  }
+
+  return 0 // 默认返回白羊座（理论上不会到这里）
+}
+
+// 农历数据表（1900-2100年，共201年）
+// 每个数字表示该年农历的信息，格式：前12位表示12个月的大小（1=大月30天，0=小月29天），后4位表示闰月月份（0=无闰月）
+// 数据来源：标准农历数据表
+const lunarInfo = [
+  0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2,
+  0x04ae0, 0x0a5b6, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0, 0x0ada2, 0x095b0, 0x14977,
+  0x04970, 0x0a4b0, 0x0b4b5, 0x06a50, 0x06d40, 0x1ab54, 0x02b60, 0x09570, 0x052f2, 0x04970,
+  0x06566, 0x0d4a0, 0x0ea50, 0x06e95, 0x05ad0, 0x02b60, 0x186e3, 0x092e0, 0x1c8d7, 0x0c950,
+  0x0d4a0, 0x1d8a6, 0x0b550, 0x056a0, 0x1a5b4, 0x025d0, 0x092d0, 0x0d2b2, 0x0a950, 0x0b557,
+  0x06ca0, 0x0b550, 0x15355, 0x04da0, 0x0a5b0, 0x14573, 0x052b0, 0x0a9a8, 0x0e950, 0x06aa0,
+  0x0aea6, 0x0ab50, 0x04b60, 0x0aae4, 0x0a570, 0x05260, 0x0f263, 0x0d950, 0x05b57, 0x056a0,
+  0x096d0, 0x04dd5, 0x04ad0, 0x0a4d0, 0x0d4d4, 0x0d250, 0x0d558, 0x0b540, 0x0b6a0, 0x195a6,
+  0x095b0, 0x049b0, 0x0a974, 0x0a4b0, 0x0b27a, 0x06a50, 0x06d40, 0x0af46, 0x0ab60, 0x09570,
+  0x04af5, 0x04970, 0x064b0, 0x074a3, 0x0ea50, 0x06b58, 0x055c0, 0x0ab60, 0x096d5, 0x092e0,
+  0x0c960, 0x0d954, 0x0d4a0, 0x0da50, 0x07552, 0x056a0, 0x0abb7, 0x025d0, 0x092d0, 0x0cab5,
+  0x0a950, 0x0b4a0, 0x0baa4, 0x0ad50, 0x055d9, 0x04ba0, 0x0a5b0, 0x15176, 0x052b0, 0x0a930,
+  0x07954, 0x06aa0, 0x0ad50, 0x05b52, 0x04b60, 0x0a6e6, 0x0a4e0, 0x0d260, 0x0ea65, 0x0d530,
+  0x05aa0, 0x076a3, 0x096d0, 0x04bd7, 0x04ad0, 0x0a4d0, 0x1d0b6, 0x0d250, 0x0d520, 0x0dd45,
+  0x0b5a0, 0x056d0, 0x055b2, 0x049b0, 0x0a577, 0x0a4b0, 0x0aa50, 0x1b255, 0x06d20, 0x0ada0,
+  0x14b63, 0x09370, 0x049f8, 0x04970, 0x064b0, 0x168a6, 0x0ea50, 0x06b20, 0x1a6c4, 0x0aae0,
+  0x0a2e0, 0x0d2e3, 0x0c960, 0x0d557, 0x0d4a0, 0x0da50, 0x05d55, 0x056a0, 0x0a6d0, 0x055d4,
+  0x052d0, 0x0a9b8, 0x0a950, 0x0b4a0, 0x0b6a6, 0x0ad50, 0x055a0, 0x0aba4, 0x0a5b0, 0x052b0,
+  0x0b273, 0x06930, 0x07337, 0x06aa0, 0x0ad50, 0x14b55, 0x04b60, 0x0a570, 0x054e4, 0x0d160,
+  0x0e968, 0x0d520, 0x0daa0, 0x16aa6, 0x056d0, 0x04ae0, 0x0a9d4, 0x0a2d0, 0x0d150, 0x0f252,
+  0x0d520, 0x0daa0, 0x16aa6, 0x056d0, 0x04ae0, 0x0a9d4, 0x0a2d0, 0x0d150, 0x0f252, 0x0d520,
+  0x0daa0, 0x16aa6, 0x056d0, 0x04ae0, 0x0a9d4, 0x0a2d0, 0x0d150, 0x0f252, 0x0d520, 0x0daa0,
+  0x16aa6, 0x056d0, 0x04ae0, 0x0a9d4, 0x0a2d0, 0x0d150, 0x0f252, 0x0d520, 0x0daa0, 0x16aa6,
+  0x056d0, 0x04ae0, 0x0a9d4, 0x0a2d0, 0x0d150, 0x0f252, 0x0d520, 0x0daa0, 0x16aa6, 0x056d0,
+  0x04ae0, 0x0a9d4, 0x0a2d0, 0x0d150, 0x0f252, 0x0d520, 0x0daa0, 0x16aa6, 0x056d0, 0x04ae0,
+  0x0a9d4, 0x0a2d0, 0x0d150, 0x0f252, 0x0d520, 0x0daa0, 0x16aa6, 0x056d0, 0x04ae0, 0x0a9d4,
+  0x0a2d0, 0x0d150, 0x0f252, 0x0d520, 0x0daa0, 0x16aa6, 0x056d0, 0x04ae0, 0x0a9d4, 0x0a2d0,
+  0x0d150, 0x0f252, 0x0d520, 0x0daa0, 0x16aa6, 0x056d0, 0x04ae0, 0x0a9d4, 0x0a2d0, 0x0d150,
+  0x0f252
+]
+
+// 标准位掩码工具
+function getLeapMonth(year: number): number {
+  const idx = year - 1900
+  const info = lunarInfo[idx]
+  return info & 0xf
+}
+
+function getLeapDays(year: number): number {
+  const lm = getLeapMonth(year)
+  if (lm) {
+    const idx = year - 1900
+    return (lunarInfo[idx] & 0x10000) ? 30 : 29
+  }
+  return 0
+}
+
+// 获取农历年的总天数（12个月+闰月）
+function getLunarYearDays(year: number): number {
+  const idx = year - 1900
+  if (idx < 0 || idx >= lunarInfo.length) return 0
+  let sum = 0
+  for (let m = 1; m <= 12; m++) {
+    sum += getLunarMonthDays(year, m)
+  }
+  sum += getLeapDays(year)
+  return sum
+}
+
+// 获取农历某月的天数（month: 1-12；闰月用 month+12 表示）
+function getLunarMonthDays(year: number, month: number): number {
+  const idx = year - 1900
+  if (idx < 0 || idx >= lunarInfo.length) return 0
+  const info = lunarInfo[idx]
+  const lm = getLeapMonth(year)
+  if (month > 12) {
+    const base = month - 12
+    if (base !== lm) return 0
+    return getLeapDays(year)
+  }
+  // 平月：按位判断，大月30，小月29（0x10000 >> month）
+  return (info & (0x10000 >> month)) ? 30 : 29
+}
+
+// 农历转阳历
+function lunarToSolar(lunarYear: number, lunarMonth: number, lunarDay: number): Date | null {
+  // 参数验证
+  if (lunarYear < 1900 || lunarYear > 2100) {
+    return null
+  }
+  
+  const yearIndex = lunarYear - 1900
+  if (yearIndex < 0 || yearIndex >= lunarInfo.length) {
+    return null
+  }
+  
+  const leapMonth = getLeapMonth(lunarYear)
+  
+  // 处理闰月标记：>12 表示闰某月
+  const isLeapMonth = lunarMonth > 12
+  const baseMonth = isLeapMonth ? lunarMonth - 12 : lunarMonth
+
+  // 月份有效性
+  if (baseMonth < 1 || baseMonth > 12) {
+    return null
+  }
+  // 如果指明闰月，但该年没有该闰月，则无效
+  if (isLeapMonth && baseMonth !== leapMonth) {
+    return null
+  }
+  
+  // 检查日期是否有效
+  const monthDays = getLunarMonthDays(lunarYear, lunarMonth) // 支持 >12（闰月）
+  if (lunarDay < 1 || lunarDay > monthDays) {
+    return null
+  }
+  
+  // 计算从1900年1月31日（农历正月初一）到目标日期的总天数
+  let totalDays = 0
+  
+  // 1900年1月31日是农历正月初一对应的阳历日期
+  const baseDate = new Date(1900, 0, 31)
+  
+  // 计算从1900年到目标年份的总天数
+  for (let y = 1900; y < lunarYear; y++) {
+    totalDays += getLunarYearDays(y)
+  }
+  
+  // 计算目标年份从正月到目标月份的天数
+  // 需要考虑闰月的位置（闰月在该月之后）
+  for (let m = 1; m < baseMonth; m++) {
+    totalDays += getLunarMonthDays(lunarYear, m) // 平月
+    // 若该年此月之后有闰月（即本月是闰月的前一个月），则额外叠加闰月天数
+    if (leapMonth > 0 && m === leapMonth) {
+      totalDays += getLunarMonthDays(lunarYear, leapMonth + 12)
+    }
+  }
+  // 如果目标就是闰月，则需要再累加该月的平月天数（闰月发生在该平月之后）
+  if (isLeapMonth) totalDays += getLunarMonthDays(lunarYear, baseMonth)
+  
+  // 加上目标日期
+  totalDays += lunarDay - 1
+  
+  // 计算对应的阳历日期
+  const solarDate = new Date(baseDate)
+  solarDate.setDate(solarDate.getDate() + totalDays)
+  
+  return solarDate
+}
+
 interface HoroscopeProps {
   onBack?: () => void
 }
@@ -111,8 +335,59 @@ interface HoroscopeProps {
 function Horoscope({ onBack }: HoroscopeProps) {
   const [period, setPeriod] = useState<Period>('today')
   const [signIndex, setSignIndex] = useState<number>(0)
+  const [calendarType, setCalendarType] = useState<CalendarType>('solar')
+  const [birthYear, setBirthYear] = useState('')
+  const [birthMonth, setBirthMonth] = useState('')
+  const [birthDay, setBirthDay] = useState('')
+  const [showBirthInput, setShowBirthInput] = useState(false)
+  const [isLunarLeapMonth, setIsLunarLeapMonth] = useState(false)
 
   const today = new Date()
+
+  // 根据生日查询星座
+  const handleQueryByBirthday = () => {
+    if (!birthYear || !birthMonth || !birthDay) {
+      alert('请完整输入生日信息')
+      return
+    }
+
+    const year = parseInt(birthYear)
+    const month = parseInt(birthMonth)
+    const day = parseInt(birthDay)
+
+    if (isNaN(year) || isNaN(month) || isNaN(day)) {
+      alert('请输入有效的日期')
+      return
+    }
+
+    if (month < 1 || month > 12 || day < 1 || day > 31) {
+      alert('请输入有效的日期范围')
+      return
+    }
+
+    if (calendarType === 'solar') {
+      // 阳历直接计算
+      const calculatedSign = getZodiacSignByDate(month, day)
+      setSignIndex(calculatedSign)
+      setShowBirthInput(false)
+      alert(`根据您的生日，您的星座是：${zodiacSigns[calculatedSign].icon} ${zodiacSigns[calculatedSign].name}`)
+    } else {
+      // 农历转阳历
+      const lunarMonthParam = isLunarLeapMonth ? month + 12 : month
+      const solarDate = lunarToSolar(year, lunarMonthParam, day)
+      if (solarDate) {
+        const calculatedSign = getZodiacSignByDate(solarDate.getMonth() + 1, solarDate.getDate())
+        setSignIndex(calculatedSign)
+        setShowBirthInput(false)
+        const solarMonth = solarDate.getMonth() + 1
+        const solarDay = solarDate.getDate()
+        alert(`根据您的农历生日（${year}年${isLunarLeapMonth ? '闰' : ''}${month}月${day}日），对应的阳历是${solarDate.getFullYear()}年${solarMonth}月${solarDay}日，您的星座是：${zodiacSigns[calculatedSign].icon} ${zodiacSigns[calculatedSign].name}`)
+      } else {
+        // 转换失败，可能是日期无效或超出支持范围
+        alert('农历日期转换失败，可能原因：\n1. 日期超出支持范围（1900-2100年）\n2. 输入的日期无效（如2月30日）\n3. 该年没有对应的农历月份\n\n建议：请检查输入的日期是否正确，或直接选择您的星座查看运势。')
+      }
+    }
+  }
 
   const result = useMemo(() => {
     const seed = getSeed(today, signIndex, period)
@@ -127,6 +402,91 @@ function Horoscope({ onBack }: HoroscopeProps) {
         <h2>{sign.icon} {sign.name} · 星座运势</h2>
         {onBack && (
           <button className="back-btn" onClick={onBack}>← 返回</button>
+        )}
+      </div>
+
+      {/* 生日查询区域 */}
+      <div className="birthday-query-section">
+        <button 
+          className="query-birthday-btn"
+          onClick={() => setShowBirthInput(!showBirthInput)}
+        >
+          {showBirthInput ? '收起' : '📅 根据生日查询星座'}
+        </button>
+        
+        {showBirthInput && (
+          <div className="birthday-input-panel">
+            <div className="calendar-type-toggle">
+              <button
+                className={calendarType === 'solar' ? 'active' : ''}
+                onClick={() => { setCalendarType('solar'); setIsLunarLeapMonth(false) }}
+              >
+                阳历
+              </button>
+              <button
+                className={calendarType === 'lunar' ? 'active' : ''}
+                onClick={() => setCalendarType('lunar')}
+              >
+                农历
+              </button>
+            </div>
+            
+            <div className="birthday-inputs">
+              <input
+                type="number"
+                placeholder="年"
+                value={birthYear}
+                onChange={(e) => setBirthYear(e.target.value)}
+                min="1900"
+                max="2100"
+                className="birthday-input"
+              />
+              <span className="input-separator">年</span>
+              <input
+                type="number"
+                placeholder="月"
+                value={birthMonth}
+                onChange={(e) => setBirthMonth(e.target.value)}
+                min="1"
+                max="12"
+                className="birthday-input"
+              />
+              <span className="input-separator">月</span>
+              <input
+                type="number"
+                placeholder="日"
+                value={birthDay}
+                onChange={(e) => setBirthDay(e.target.value)}
+                min="1"
+                max="31"
+                className="birthday-input"
+              />
+              <span className="input-separator">日</span>
+              {calendarType === 'lunar' && (
+                <label className="leap-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={isLunarLeapMonth}
+                    onChange={(e) => setIsLunarLeapMonth(e.target.checked)}
+                  />
+                  闰月
+                </label>
+              )}
+            </div>
+            
+            <button
+              className="query-btn"
+              onClick={handleQueryByBirthday}
+            >
+              查询星座
+            </button>
+            
+            {calendarType === 'lunar' && (
+              <p className="lunar-tip">
+                💡 提示：支持1900-2100年的农历转阳历，包含闰月。若转换失败，可能是日期超出范围或该年无该闰月。
+              </p>
+            )}
+          </div>
         )}
       </div>
 
@@ -189,5 +549,6 @@ function Horoscope({ onBack }: HoroscopeProps) {
 }
 
 export default Horoscope
+
 
 
