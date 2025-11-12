@@ -15,6 +15,7 @@ import NameGenerator from './components/NameGenerator'
 import Horoscope from './components/Horoscope'
 import Almanac from './components/Almanac'
 import CyberMerit from './components/CyberMerit'
+import BaziFortune from './components/BaziFortune'
 import { getCardIcon, getSuitIcon } from './utils/cardIcons'
 import { generateThreeCardReading } from './utils/readingInterpretation'
 import { downloadReading } from './utils/exportReading'
@@ -37,7 +38,7 @@ function App() {
   const [showReadingTypeSelector, setShowReadingTypeSelector] = useState(false)
   const [selectedReadingType, setSelectedReadingType] = useState<ReadingType>('general')
   const [customQuestion, setCustomQuestion] = useState<string | undefined>(undefined)
-  const [currentPage, setCurrentPage] = useState<'tarot' | 'name' | 'horoscope' | 'almanac' | 'cybermerit'>('tarot')
+  const [currentPage, setCurrentPage] = useState<'tarot' | 'name' | 'horoscope' | 'almanac' | 'cybermerit' | 'bazi'>('tarot')
 
   // 从localStorage加载历史记录
   useEffect(() => {
@@ -257,7 +258,8 @@ function App() {
            currentPage === 'name' ? '智能取名服务' : 
            currentPage === 'horoscope' ? '星座运势 · 娱乐参考' :
            currentPage === 'almanac' ? '今日黄历 · 传统历法' :
-           '赛博积德 · 功德无量'}
+           currentPage === 'cybermerit' ? '赛博积德 · 功德无量' :
+           '八字算命 · 传统命理'}
         </p>
         <div className="header-nav">
           <button
@@ -290,6 +292,12 @@ function App() {
           >
             🙏 赛博积德
           </button>
+          <button
+            className={`nav-btn ${currentPage === 'bazi' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('bazi')}
+          >
+            ☯ 八字算命
+          </button>
         </div>
         {currentPage === 'tarot' && (
           <div className="header-actions">
@@ -309,6 +317,8 @@ function App() {
           <Almanac onBack={() => setCurrentPage('tarot')} />
         ) : currentPage === 'cybermerit' ? (
           <CyberMerit onBack={() => setCurrentPage('tarot')} />
+        ) : currentPage === 'bazi' ? (
+          <BaziFortune onBack={() => setCurrentPage('tarot')} />
         ) : (
           <>
         {/* 单张牌抽牌动画 */}
