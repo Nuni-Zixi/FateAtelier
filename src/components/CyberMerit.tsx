@@ -136,22 +136,30 @@ function CyberMerit({ onBack }: CyberMeritProps) {
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
       
       if (type === 'woodfish') {
-        // 木鱼声音：使用方波，快速衰减，更低沉
-        const oscillator = audioContext.createOscillator()
-        const gainNode = audioContext.createGain()
+        // 木鱼声音：使用多个频率叠加，模拟木鱼的共鸣效果
+        const baseFreq = 80 // 基频更低
+        const overtones = [baseFreq, baseFreq * 2, baseFreq * 3] // 基频和泛音
         
-        oscillator.connect(gainNode)
-        gainNode.connect(audioContext.destination)
-        
-        oscillator.frequency.value = frequency
-        oscillator.type = 'square' // 方波更接近木鱼的声音
-        
-        // 快速衰减，模拟木鱼的短促声音
-        gainNode.gain.setValueAtTime(0.4, audioContext.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05) // 50ms快速衰减
-        
-        oscillator.start(audioContext.currentTime)
-        oscillator.stop(audioContext.currentTime + 0.1) // 100ms总时长
+        overtones.forEach((freq, index) => {
+          const oscillator = audioContext.createOscillator()
+          const gainNode = audioContext.createGain()
+          
+          oscillator.connect(gainNode)
+          gainNode.connect(audioContext.destination)
+          
+          oscillator.frequency.value = freq
+          oscillator.type = index === 0 ? 'square' : 'sine' // 基频用方波，泛音用正弦波
+          
+          // 不同频率的音量不同，基频最响
+          const volume = index === 0 ? 0.3 : (index === 1 ? 0.15 : 0.08)
+          
+          // 快速衰减，模拟木鱼的短促敲击声
+          gainNode.gain.setValueAtTime(volume, audioContext.currentTime)
+          gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.08) // 80ms快速衰减
+          
+          oscillator.start(audioContext.currentTime)
+          oscillator.stop(audioContext.currentTime + 0.12) // 120ms总时长
+        })
       } else {
         // 其他音效保持原样
         const oscillator = audioContext.createOscillator()
@@ -203,7 +211,7 @@ function CyberMerit({ onBack }: CyberMeritProps) {
       
       return newCount
     })
-    playSound(120, 100, 'woodfish') // 低沉的木鱼声
+    playSound(80, 100, 'woodfish') // 低沉的木鱼声
   }
 
   // 赛博放生
