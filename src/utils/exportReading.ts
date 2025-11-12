@@ -1,7 +1,7 @@
 import { ReadingRecord } from '../components/ReadingHistory'
 
 export const exportReadingToText = (reading: ReadingRecord): string => {
-  let text = '🔮 命运工坊 - 塔罗牌占卜记录\n'
+  let text = '🔮 命运工坊 - 玄机阁\n'
   text += '='.repeat(40) + '\n\n'
 
   const date = new Date(reading.timestamp)
