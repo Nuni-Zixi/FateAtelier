@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import './NameGenerator.css'
 
 interface NameGeneratorProps {
@@ -14,12 +14,7 @@ function NameGenerator({ onBack }: NameGeneratorProps) {
   const [nameLength, setNameLength] = useState<'any' | '2' | '3' | '4'>('any')
   const [generatedNames, setGeneratedNames] = useState<string[]>([])
   const [isGenerating, setIsGenerating] = useState(false)
-  // 默认使用提供的Gemini API Key
-  const apiKey = 'AIzaSyB0wjOKKOdLVoyAlRmJDWjqUFcCX0eM2oA'
-  
-  // 防止重复请求
-  const lastRequestTime = useRef<number>(0)
-  const REQUEST_COOLDOWN = 2000 // 2秒内不允许重复请求
+  const [generateCount, setGenerateCount] = useState(0) // 生成计数器，用于增加多样性
 
   const preferenceOptions = [
     '文雅', '活泼', '沉稳', '清新', '古典', '现代', '诗意', '简洁',
@@ -34,186 +29,41 @@ function NameGenerator({ onBack }: NameGeneratorProps) {
     )
   }
 
-  // 调用Gemini API生成名字（带重试机制）
-  const generateNamesWithGemini = async (prompt: string, surnameForMatch: string, retries: number = 2): Promise<string[]> => {
-    // 构建完整的提示词，包含系统指令
-    const fullPrompt = `你是一个专业的中文起名专家，擅长根据用户需求生成优雅、自然、符合中文命名习惯的名字。请只返回名字列表，每行一个名字，不要添加任何解释或其他文字。\n\n${prompt}`
-    
-    for (let attempt = 1; attempt <= retries; attempt++) {
-      try {
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              contents: [{
-                parts: [{
-                  text: fullPrompt
-                }]
-              }],
-              generationConfig: {
-                temperature: 0.8,
-                maxOutputTokens: 500
-              }
-            })
-          }
-        )
-
-        if (!response.ok) {
-          // 429错误（请求过多）或500错误，可以重试
-          if ((response.status === 429 || response.status >= 500) && attempt < retries) {
-            // 检查响应头中的Retry-After
-            const retryAfter = response.headers.get('Retry-After')
-            let delay = 5000 // 默认5秒
-            
-            if (retryAfter) {
-              delay = parseInt(retryAfter) * 1000 // 转换为毫秒
-            } else {
-              // 指数退避：第一次重试5秒，第二次10秒
-              delay = 5000 * attempt
-            }
-            
-            // 429错误时等待更长时间，最多30秒
-            delay = Math.min(delay, 30000)
-            await new Promise(resolve => setTimeout(resolve, delay))
-            continue // 重试
-          }
-          
-          // 其他错误或重试次数用完，抛出错误
-          const errorText = response.status === 429 
-            ? '请求过于频繁，请稍后再试（已自动使用本地生成）' 
-            : response.status === 400
-            ? '请求参数错误'
-            : response.status === 401
-            ? 'API密钥无效'
-            : response.status === 403
-            ? 'API访问被拒绝'
-            : `API请求失败 (${response.status})`
-          throw new Error(errorText)
-        }
-
-        const data = await response.json()
-        const content = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
-        
-        // 解析返回的名字列表
-        const names = content
-          .split('\n')
-          .map((line: string) => line.trim())
-          .filter((line: string) => {
-            // 提取名字（去除序号、标点等），动态匹配姓氏
-            const surnamePattern = surnameForMatch.length > 0 ? surnameForMatch[0] : '[\\u4e00-\\u9fa5]'
-            const match = line.match(new RegExp(`${surnamePattern}[\\u4e00-\\u9fa5]{1,3}`))
-            return match ? match[0] : null
-          })
-          .filter((name: string | null): name is string => name !== null)
-          .filter((name: string, index: number, self: string[]) => self.indexOf(name) === index) // 去重
-          .slice(0, 10) // 最多10个
-
-        return names.length > 0 ? names : []
-      } catch (error) {
-        // 最后一次尝试失败，抛出错误
-        if (attempt === retries) {
-          console.error('Gemini API调用失败:', error)
-          throw error
-        }
-        // 否则继续重试
-      }
-    }
-    
-    return [] // 理论上不会到达这里
-  }
-
   const generateNames = async () => {
     if (!surname.trim()) {
       alert('请输入姓氏')
       return
     }
 
-    // 防止重复请求：检查距离上次请求的时间
-    const now = Date.now()
-    if (now - lastRequestTime.current < REQUEST_COOLDOWN) {
-      const remainingTime = Math.ceil((REQUEST_COOLDOWN - (now - lastRequestTime.current)) / 1000)
-      alert(`请稍候 ${remainingTime} 秒后再试，避免请求过于频繁`)
+    // 如果正在生成，直接返回
+    if (isGenerating) {
       return
     }
-    
-    lastRequestTime.current = now
+
     setIsGenerating(true)
     
     try {
-      let names: string[] = []
-
-      // 优先使用Gemini生成
-      try {
-        // 计算生辰八字
-        const bazi = calculateBazi(birthDate, birthTime)
-        const wuxingCount = analyzeWuxing(bazi)
-        
-        // 构建prompt
-        let prompt = `请为姓氏"${surname}"生成${nameLength === 'any' ? '任意长度' : nameLength === '2' ? '两个字' : nameLength === '3' ? '三个字' : '四个字'}的中文名字，要求：\n`
-        
-        if (gender === 'male') {
-          prompt += '- 性别：男\n'
-        } else if (gender === 'female') {
-          prompt += '- 性别：女\n'
-        } else {
-          prompt += '- 性别：不限\n'
-        }
-
-        if (birthDate) {
-          prompt += `- 出生日期：${birthDate}\n`
-          if (bazi.length > 0) {
-            prompt += `- 生辰八字：${bazi.join(' ')}\n`
-            const wuxingInfo = Object.entries(wuxingCount)
-              .map(([wuxing, count]) => `${wuxing}:${count}`)
-              .join(' ')
-            prompt += `- 五行分布：${wuxingInfo}\n`
-            const neededWuxing = Object.entries(wuxingCount)
-              .filter(([_, count]) => count < Object.values(wuxingCount).reduce((a, b) => a + b, 0) / 5)
-              .map(([wuxing]) => wuxing)
-            if (neededWuxing.length > 0) {
-              prompt += `- 建议补充的五行：${neededWuxing.join('、')}\n`
-            }
-          }
-        }
-
-        if (birthTime) {
-          prompt += `- 出生时间：${birthTime}\n`
-        }
-
-        if (preferences.length > 0) {
-          prompt += `- 个人偏好：${preferences.join('、')}\n`
-        }
-
-        prompt += `\n请生成10个优雅、自然、符合中文命名习惯的名字，每个名字都要好听、有意义。只返回名字，每行一个，格式如：${surname}XX。`
-
-        names = await generateNamesWithGemini(prompt, surname)
-        
-        // 如果Gemini生成失败或数量不足，使用本地生成补充
-        if (names.length < 10) {
-          const localNames = generateNameList(surname, gender, birthDate, birthTime, preferences, nameLength)
-          names = [...names, ...localNames].slice(0, 10)
-        }
-      } catch (geminiError: any) {
-        console.error('Gemini生成失败，使用本地生成:', geminiError)
-        // 如果Gemini调用失败，使用本地生成
-        names = generateNameList(surname, gender, birthDate, birthTime, preferences, nameLength)
-        // 只在非429错误时显示提示（429错误会自动重试，如果最终失败说明确实请求过多）
-        if (geminiError?.message && !geminiError.message.includes('请求过于频繁')) {
-          // 静默失败，自动使用本地生成，不打扰用户
-        }
+      // 增加生成计数器，确保每次生成都不同
+      const newCount = generateCount + 1
+      setGenerateCount(newCount)
+      
+      // 直接使用本地生成，传入生成计数器作为变化因子
+      const names = generateNameList(surname, gender, birthDate, birthTime, preferences, nameLength, newCount)
+      
+      // 确保生成了名字
+      if (names && names.length > 0) {
+        setGeneratedNames(names)
+      } else {
+        console.warn('生成的名字列表为空')
+        alert('生成名字失败，请重试')
       }
-
-      setGeneratedNames(names)
     } catch (error) {
       console.error('生成名字失败:', error)
-      // 最终回退到本地生成
-      const localNames = generateNameList(surname, gender, birthDate, birthTime, preferences, nameLength)
-      setGeneratedNames(localNames)
+      alert('生成名字失败，请重试')
+      // 确保即使出错也重置状态
+      setGeneratedNames([])
     } finally {
+      // 确保状态一定会被重置
       setIsGenerating(false)
     }
   }
@@ -568,9 +418,10 @@ function NameGenerator({ onBack }: NameGeneratorProps) {
     birthDate: string,
     birthTime: string,
     preferences: string[],
-    length: 'any' | '2' | '3' | '4'
+    length: 'any' | '2' | '3' | '4',
+    generateCount: number = 0 // 生成计数器，用于增加多样性
   ): string[] => {
-    // 生成确定性种子（基于输入参数）
+    // 生成确定性种子（基于输入参数 + 生成计数器）
     let seedBase = 0
     for (let i = 0; i < surname.length; i++) {
       seedBase = seedBase * 31 + surname.charCodeAt(i)
@@ -583,6 +434,10 @@ function NameGenerator({ onBack }: NameGeneratorProps) {
     }
     seedBase = seedBase * 31 + preferences.length
     seedBase = seedBase * 31 + gender.length
+    // 添加生成计数器，确保每次生成都不同
+    seedBase = seedBase * 31 + generateCount
+    // 添加时间戳的毫秒数（取后6位），进一步增加随机性
+    seedBase = seedBase * 31 + (Date.now() % 1000000)
     // 计算生辰八字并分析五行
     const bazi = calculateBazi(birthDate, birthTime)
     const wuxingCount = analyzeWuxing(bazi)
@@ -780,34 +635,162 @@ function NameGenerator({ onBack }: NameGeneratorProps) {
     const nameCount = 10
     const usedNames = new Set<string>() // 用于去重
     
+    // 常见名字模式库（提高名字的自然度）
+    const commonNamePatterns: { [key: string]: string[][] } = {
+      'male': [
+        ['浩', '宇'], ['文', '博'], ['天', '佑'], ['明', '轩'], ['志', '远'],
+        ['俊', '杰'], ['睿', '智'], ['博', '文'], ['宇', '恒'], ['文', '轩'],
+        ['浩', '然'], ['文', '昊'], ['天', '宇'], ['文', '远'], ['博', '远'],
+        ['浩', '文'], ['文', '浩'], ['天', '文'], ['文', '天'], ['博', '天']
+      ],
+      'female': [
+        ['雨', '涵'], ['思', '涵'], ['诗', '涵'], ['语', '嫣'], ['欣', '悦'],
+        ['梦', '瑶'], ['诗', '雨'], ['语', '桐'], ['欣', '怡'], ['思', '雨'],
+        ['雨', '桐'], ['诗', '雅'], ['语', '欣'], ['欣', '桐'], ['思', '雅'],
+        ['雨', '欣'], ['诗', '悦'], ['语', '涵'], ['欣', '涵'], ['思', '悦']
+      ],
+      'neutral': [
+        ['文', '静'], ['安', '宁'], ['和', '平'], ['明', '理'], ['智', '慧'],
+        ['文', '雅'], ['安', '静'], ['和', '谐'], ['明', '智'], ['智', '明']
+      ]
+    }
+
+    // 音韵评分：评估名字的读音是否顺口
+    const evaluatePronunciation = (name: string): number => {
+      let score = 100
+      const chars = name.split('')
+      const uniqueChars = new Set(chars)
+      if (chars.length !== uniqueChars.size) {
+        score -= 30
+      }
+      for (let i = 0; i < chars.length - 1; i++) {
+        if (chars[i] === chars[i + 1]) {
+          score -= 20
+        }
+      }
+      return Math.max(0, score)
+    }
+
+    // 字义搭配评分：评估名字的字义是否协调
+    const evaluateMeaning = (name: string, gender: string): number => {
+      let score = 100
+      const patterns = commonNamePatterns[gender as keyof typeof commonNamePatterns] || 
+                       commonNamePatterns['neutral']
+      let foundPattern = false
+      for (const pattern of patterns) {
+        if (name.includes(pattern[0]) && name.includes(pattern[1])) {
+          score += 20
+          foundPattern = true
+          break
+        }
+      }
+      if (!foundPattern && name.length >= 2) {
+        score -= 10
+      }
+      return Math.max(0, score)
+    }
+
+    // 综合评分函数
+    const scoreName = (fullName: string, gender: string): number => {
+      const namePart = fullName.slice(fullName.length > 2 ? 2 : 1)
+      const pronunciationScore = evaluatePronunciation(namePart)
+      const meaningScore = evaluateMeaning(namePart, gender)
+      return pronunciationScore * 0.4 + meaningScore * 0.6
+    }
+
+    // 改进的名字生成函数：考虑字符搭配，但保持多样性
+    const generateBetterName = (charCount: number, nameIndex: number): string => {
+      const nameSeed = seedBase * 1000 + nameIndex * 100 + charCount
+      const shuffled = shuffle(nameSeed, charPool)
+      
+      // 如果是2个字的名字，30%概率使用常见模式（增加多样性）
+      if (charCount === 2 && (hash(nameSeed + 999) % 10 < 3)) {
+        const patterns = commonNamePatterns[gender as keyof typeof commonNamePatterns] || 
+                         commonNamePatterns['neutral']
+        if (patterns.length > 0) {
+          const patternIndex = hash(nameSeed) % patterns.length
+          const pattern = patterns[patternIndex]
+          if (charPool.includes(pattern[0]) && charPool.includes(pattern[1])) {
+            return pattern[0] + pattern[1]
+          }
+        }
+      }
+      
+      // 使用改进的字符选择算法，增加候选数量以提高多样性
+      let name = ''
+      const usedChars = new Set<string>()
+      
+      for (let i = 0; i < charCount; i++) {
+        let bestChar = ''
+        let bestScore = -1
+        const candidates: Array<{ char: string, score: number }> = []
+        
+        // 尝试更多候选字符（增加到50个），收集所有候选
+        for (let j = 0; j < Math.min(50, shuffled.length); j++) {
+          const candidateIndex = (hash(nameSeed + i * 100 + j) % shuffled.length)
+          const candidate = shuffled[candidateIndex] as string
+          
+          if (usedChars.has(candidate)) continue
+          
+          // 计算临时名字的评分
+          const tempName = name + candidate
+          const tempFullName = surname + tempName
+          const score = scoreName(tempFullName, gender)
+          
+          candidates.push({ char: candidate, score })
+          
+          if (score > bestScore) {
+            bestScore = score
+            bestChar = candidate
+          }
+        }
+        
+        // 增加随机性：70%概率选择最佳，30%概率从前5名中随机选择
+        if (candidates.length > 0) {
+          candidates.sort((a, b) => b.score - a.score)
+          const topCandidates = candidates.slice(0, Math.min(5, candidates.length))
+          
+          if (topCandidates.length > 0 && (hash(nameSeed + i * 1000) % 10 < 7)) {
+            // 70%概率选择最佳
+            bestChar = topCandidates[0].char
+          } else if (topCandidates.length > 1) {
+            // 30%概率从前5名中随机选择
+            const randomIndex = hash(nameSeed + i * 2000) % topCandidates.length
+            bestChar = topCandidates[randomIndex].char
+          } else {
+            bestChar = topCandidates[0].char
+          }
+        }
+        
+        if (bestChar) {
+          name += bestChar
+          usedChars.add(bestChar)
+        } else {
+          // 如果找不到合适的，使用第一个未使用的字符
+          for (let j = 0; j < shuffled.length; j++) {
+            const char = shuffled[j] as string
+            if (!usedChars.has(char)) {
+              name += char
+              usedChars.add(char)
+              break
+            }
+          }
+        }
+        
+        if (name.length >= charCount) break
+      }
+      
+      return name
+    }
+
     // 计算名字部分的长度：总长度 - 姓氏长度 = 名字部分长度
     const getNamePartLength = (totalLength: number): number => {
       return totalLength - surnameLength
     }
     
-    // 从字符库中确定性选择字符组合生成名字
+    // 使用改进的名字生成函数
     const generateRandomName = (charCount: number, nameIndex: number): string => {
-      // 使用确定性打乱
-      const nameSeed = seedBase * 1000 + nameIndex * 100 + charCount
-      const shuffled = shuffle(nameSeed, charPool)
-      let name = ''
-      const usedChars = new Set<string>() // 避免同一名字中重复字符
-      
-      for (let i = 0; i < charCount && i < shuffled.length; i++) {
-        // 尝试找到一个未使用的字符
-        let attempts = 0
-        let char = shuffled[i]
-        while (usedChars.has(char) && attempts < shuffled.length) {
-          const nextIndex = (i + attempts + 1) % shuffled.length
-          char = shuffled[nextIndex]
-          attempts++
-        }
-        if (!usedChars.has(char)) {
-          name += char
-          usedChars.add(char)
-        }
-      }
-      return name
+      return generateBetterName(charCount, nameIndex)
     }
     
     if (length === 'any') {
@@ -1003,10 +986,42 @@ function NameGenerator({ onBack }: NameGeneratorProps) {
       }
     }
 
-    // 去重并确定性打乱顺序
+    // 去重、评分排序并返回（增加多样性）
     const uniqueNames = Array.from(new Set(selectedNames))
-    const shuffled = shuffle(seedBase + 9999, uniqueNames)
-    return shuffled.slice(0, nameCount)
+    
+    // 如果没有生成任何名字，返回空数组
+    if (uniqueNames.length === 0) {
+      return []
+    }
+    
+    // 对名字进行评分
+    const scoredNames = uniqueNames.map(name => ({
+      name,
+      score: scoreName(name, gender)
+    }))
+    
+    // 按评分分组，但增加随机性
+    scoredNames.sort((a, b) => {
+      // 如果评分差距小于5分，视为相近，增加随机性
+      if (Math.abs(b.score - a.score) < 5) {
+        return hash(seedBase + uniqueNames.indexOf(a.name)) - hash(seedBase + uniqueNames.indexOf(b.name))
+      }
+      // 评分差距较大时，评分高的在前
+      return b.score - a.score
+    })
+    
+    // 返回前nameCount个名字，但增加一些随机打乱
+    const result = scoredNames.slice(0, nameCount).map(item => item.name)
+    
+    // 确保至少有结果返回
+    if (result.length === 0 && uniqueNames.length > 0) {
+      return uniqueNames.slice(0, nameCount)
+    }
+    
+    // 对结果进行轻微打乱，保持质量的同时增加多样性
+    const finalShuffled = shuffle(seedBase + 8888, result)
+    
+    return finalShuffled
   }
 
   const copyName = (name: string) => {
