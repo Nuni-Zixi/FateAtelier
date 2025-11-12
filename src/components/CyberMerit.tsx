@@ -131,23 +131,44 @@ function CyberMerit({ onBack }: CyberMeritProps) {
   }
 
   // 播放音效（使用Web Audio API生成简单音效）
-  const playSound = (frequency: number, duration: number = 100) => {
+  const playSound = (frequency: number, duration: number = 100, type: 'woodfish' | 'release' | 'incense' | 'prayer' = 'woodfish') => {
     try {
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
-      const oscillator = audioContext.createOscillator()
-      const gainNode = audioContext.createGain()
       
-      oscillator.connect(gainNode)
-      gainNode.connect(audioContext.destination)
-      
-      oscillator.frequency.value = frequency
-      oscillator.type = 'sine'
-      
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000)
-      
-      oscillator.start(audioContext.currentTime)
-      oscillator.stop(audioContext.currentTime + duration / 1000)
+      if (type === 'woodfish') {
+        // 木鱼声音：使用方波，快速衰减，更低沉
+        const oscillator = audioContext.createOscillator()
+        const gainNode = audioContext.createGain()
+        
+        oscillator.connect(gainNode)
+        gainNode.connect(audioContext.destination)
+        
+        oscillator.frequency.value = frequency
+        oscillator.type = 'square' // 方波更接近木鱼的声音
+        
+        // 快速衰减，模拟木鱼的短促声音
+        gainNode.gain.setValueAtTime(0.4, audioContext.currentTime)
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05) // 50ms快速衰减
+        
+        oscillator.start(audioContext.currentTime)
+        oscillator.stop(audioContext.currentTime + 0.1) // 100ms总时长
+      } else {
+        // 其他音效保持原样
+        const oscillator = audioContext.createOscillator()
+        const gainNode = audioContext.createGain()
+        
+        oscillator.connect(gainNode)
+        gainNode.connect(audioContext.destination)
+        
+        oscillator.frequency.value = frequency
+        oscillator.type = 'sine'
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000)
+        
+        oscillator.start(audioContext.currentTime)
+        oscillator.stop(audioContext.currentTime + duration / 1000)
+      }
     } catch (e) {
       console.log('音频播放失败', e)
     }
@@ -182,7 +203,7 @@ function CyberMerit({ onBack }: CyberMeritProps) {
       
       return newCount
     })
-    playSound(200, 150) // 低沉的木鱼声
+    playSound(120, 100, 'woodfish') // 低沉的木鱼声
   }
 
   // 赛博放生
@@ -263,7 +284,7 @@ function CyberMerit({ onBack }: CyberMeritProps) {
       
       return newCount
     })
-    playSound(400, 200) // 清脆的放生音效
+    playSound(400, 200, 'release') // 清脆的放生音效
   }
 
   // 赛博上香
@@ -300,7 +321,7 @@ function CyberMerit({ onBack }: CyberMeritProps) {
       
       return newCount
     })
-    playSound(300, 250) // 悠扬的香火音效
+    playSound(300, 250, 'incense') // 悠扬的香火音效
     
     // 10秒后燃烧完成
     setTimeout(() => {
@@ -342,7 +363,7 @@ function CyberMerit({ onBack }: CyberMeritProps) {
       
       return newCount
     })
-    playSound(250, 300) // 庄重的祈福音效
+    playSound(250, 300, 'prayer') // 庄重的祈福音效
     
     // 3秒后祈福完成
     setTimeout(() => {
