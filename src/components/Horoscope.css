@@ -260,26 +260,118 @@
 }
 
 @media (max-width: 768px) {
+  .horoscope {
+    padding: 12px;
+  }
+
+  .horoscope-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .horoscope-header h2 {
+    font-size: 20px;
+  }
+
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+
   .signs-scroll {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
   }
+
+  .sign-chip {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .sign-icon {
+    font-size: 16px;
+  }
+
+  .sign-name {
+    font-size: 12px;
+  }
+
+  .period-toggle button {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
   .horoscope-cards {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
+
+  .score-card, .info-card, .summary-card, .detail-card, .advice-card {
+    padding: 12px;
+  }
+
+  .score {
+    font-size: 36px;
+  }
+
   .details-grid {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
-  
+
+  .birthday-input-panel {
+    padding: 12px;
+  }
+
   .birthday-inputs {
     justify-content: center;
+    gap: 6px;
   }
-  
+
   .birthday-input {
-    width: 70px;
+    width: 60px;
+    padding: 8px 10px;
+    font-size: 14px;
   }
-  
+
   .query-btn {
     width: 100%;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .calendar-type-toggle button {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .horoscope {
+    padding: 10px;
+  }
+
+  .horoscope-header h2 {
+    font-size: 18px;
+  }
+
+  .signs-scroll {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .score {
+    font-size: 32px;
+  }
+
+  .birthday-input {
+    width: 55px;
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+
+  .input-separator {
+    font-size: 12px;
   }
 }
 

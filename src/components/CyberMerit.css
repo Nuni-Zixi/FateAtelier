@@ -1030,8 +1030,19 @@
     padding: 15px;
   }
 
+  .cyber-merit-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
   .cyber-merit-header h2 {
     font-size: 1.5rem;
+  }
+
+  .back-btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
   }
 
   .merit-stats {
@@ -1039,33 +1050,264 @@
     gap: 10px;
   }
 
+  .stat-card {
+    padding: 15px;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+  }
+
   .stat-value {
     font-size: 1.5rem;
   }
 
+  .game-tabs {
+    gap: 8px;
+  }
+
+  .tab-btn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+
   .game-content {
     padding: 20px;
+    min-height: 300px;
   }
 
+  .game-info h3 {
+    font-size: 1.5rem;
+  }
+
+  .game-info p {
+    font-size: 1rem;
+  }
+
+  /* 木鱼游戏 */
   .woodfish-body {
-    font-size: 5rem;
+    width: 200px;
+    height: 120px;
   }
 
+  .woodfish-stick {
+    top: -60px;
+    right: 20px;
+  }
+
+  .stick-handle {
+    height: 80px;
+    width: 8px;
+  }
+
+  .stick-head {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* 放生游戏 */
   .release-animals {
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
+    padding: 15px;
   }
 
   .release-animal {
     font-size: 3rem;
+    padding: 15px;
   }
 
+  /* 上香游戏 */
   .incense-stick {
+    min-height: 110px;
+  }
+
+  .stick-body {
+    height: 100px;
+  }
+
+  .stick-tip {
+    width: 10px;
+    height: 6px;
+  }
+
+  .censer {
+    width: 80px;
+    height: 65px;
+  }
+
+  .censer-mouth {
+    width: 75px;
+    height: 12px;
+  }
+
+  .censer-body {
+    width: 80px;
+    height: 50px;
+  }
+
+  /* 祈福游戏 */
+  .prayer-icon {
+    font-size: 5rem;
+  }
+
+  .prayer-lights {
+    gap: 10px;
+  }
+
+  .prayer-light {
+    width: 16px;
+    height: 16px;
+  }
+
+  .current-message {
+    font-size: 1.1rem;
+  }
+
+  .floating-text.merit {
+    font-size: 1.4rem;
+  }
+
+  .floating-text.message {
+    font-size: 1.1rem;
+  }
+
+  .floating-text.milestone {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cyber-merit {
+    padding: 10px;
+  }
+
+  .cyber-merit-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .back-btn {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+
+  .merit-stats {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .stat-card {
+    padding: 12px;
+  }
+
+  .stat-value {
+    font-size: 1.3rem;
+  }
+
+  .game-tabs {
+    gap: 6px;
+  }
+
+  .tab-btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
+  .game-content {
+    padding: 15px;
+  }
+
+  .game-info h3 {
+    font-size: 1.3rem;
+  }
+
+  .game-info p {
+    font-size: 0.9rem;
+  }
+
+  /* 木鱼游戏 */
+  .woodfish-body {
+    width: 160px;
+    height: 100px;
+  }
+
+  .woodfish-stick {
+    top: -50px;
+    right: 15px;
+  }
+
+  .stick-handle {
+    height: 70px;
+  }
+
+  .stick-head {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* 放生游戏 */
+  .release-animals {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .release-animal {
+    font-size: 2.5rem;
+    padding: 12px;
+  }
+
+  /* 上香游戏 */
+  .incense-stick {
+    min-height: 100px;
+  }
+
+  .stick-body {
+    height: 90px;
+  }
+
+  .censer {
+    width: 70px;
+    height: 55px;
+  }
+
+  .censer-mouth {
+    width: 65px;
+    height: 10px;
+  }
+
+  .censer-body {
+    width: 70px;
+    height: 42px;
+  }
+
+  .leg {
+    width: 10px;
+    height: 16px;
+  }
+
+  /* 祈福游戏 */
+  .prayer-icon {
     font-size: 4rem;
   }
 
-  .prayer-icon {
-    font-size: 5rem;
+  .prayer-lights {
+    gap: 8px;
+  }
+
+  .prayer-light {
+    width: 14px;
+    height: 14px;
+  }
+
+  .prayer-particles {
+    width: 150px;
+    height: 150px;
+  }
+
+  .prayer-particle {
+    width: 5px;
+    height: 5px;
   }
 }
 

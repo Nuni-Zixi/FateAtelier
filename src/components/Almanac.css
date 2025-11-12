@@ -220,17 +220,140 @@
 }
 
 @media (max-width: 768px) {
-  .almanac-grid {
-    grid-template-columns: 1fr;
+  .almanac {
+    padding: 12px;
   }
-  
+
+  .almanac-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .almanac-header h2 {
+    font-size: 20px;
+  }
+
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+
+  .almanac-date {
+    padding: 16px;
+  }
+
+  .date-display {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+
   .ganzhi-display {
     flex-direction: column;
     gap: 8px;
+    font-size: 14px;
   }
-  
+
+  .almanac-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .almanac-card {
+    padding: 12px;
+  }
+
+  .almanac-card h3 {
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+
+  .wuxing-value {
+    font-size: 28px;
+  }
+
+  .yi-card,
+  .ji-card {
+    padding: 12px;
+  }
+
+  .yi-card h3,
+  .ji-card h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .items-list {
+    gap: 6px;
+  }
+
+  .item-tag {
+    padding: 5px 10px;
+    font-size: 13px;
+  }
+
+  .shichen-card {
+    padding: 12px;
+  }
+
+  .shichen-card h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
   .shichen-grid {
     grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  .shichen-item {
+    padding: 8px;
+  }
+
+  .shichen-name {
+    font-size: 14px;
+  }
+
+  .shichen-jixiong {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .almanac {
+    padding: 10px;
+  }
+
+  .almanac-header h2 {
+    font-size: 18px;
+  }
+
+  .almanac-date {
+    padding: 12px;
+  }
+
+  .date-display {
+    font-size: 16px;
+  }
+
+  .ganzhi-display {
+    font-size: 13px;
+  }
+
+  .wuxing-value {
+    font-size: 24px;
+  }
+
+  .shichen-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .shichen-item {
+    padding: 6px;
+  }
+
+  .shichen-name {
+    font-size: 13px;
   }
 }
 
