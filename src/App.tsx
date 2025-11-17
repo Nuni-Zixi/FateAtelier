@@ -19,6 +19,7 @@ import BaziFortune from './components/BaziFortune'
 import DivinationDraw from './components/DivinationDraw'
 import DreamInterpretation from './components/DreamInterpretation'
 import FengshuiCompass from './components/FengshuiCompass'
+import AuspiciousDate from './components/AuspiciousDate'
 import { getCardIcon, getSuitIcon } from './utils/cardIcons'
 import { generateThreeCardReading } from './utils/readingInterpretation'
 import { downloadReading } from './utils/exportReading'
@@ -41,7 +42,7 @@ function App() {
   const [showReadingTypeSelector, setShowReadingTypeSelector] = useState(false)
   const [selectedReadingType, setSelectedReadingType] = useState<ReadingType>('general')
   const [customQuestion, setCustomQuestion] = useState<string | undefined>(undefined)
-  const [currentPage, setCurrentPage] = useState<'tarot' | 'name' | 'horoscope' | 'almanac' | 'cybermerit' | 'bazi' | 'divination' | 'dream' | 'fengshui'>('tarot')
+  const [currentPage, setCurrentPage] = useState<'tarot' | 'name' | 'horoscope' | 'almanac' | 'cybermerit' | 'bazi' | 'divination' | 'dream' | 'fengshui' | 'auspicious'>('tarot')
   const [carouselIndex, setCarouselIndex] = useState(0)
   const [carouselRotation, setCarouselRotation] = useState(0)
   const [touchStart, setTouchStart] = useState(0)
@@ -323,6 +324,7 @@ function App() {
       { page: 'divination' as const, icon: '🎋', name: '抽签求签' },
       { page: 'dream' as const, icon: '💭', name: '梦境解析' },
       { page: 'fengshui' as const, icon: '🧭', name: '风水罗盘' },
+      { page: 'auspicious' as const, icon: '⏰', name: '择日吉时' },
     ]
   }
 
@@ -364,7 +366,8 @@ function App() {
            currentPage === 'bazi' ? '八字算命 · 传统命理' :
            currentPage === 'divination' ? '抽签求签 · 心诚则灵' :
            currentPage === 'dream' ? '梦境解析 · 探索潜意识' :
-           '风水罗盘 · 方位吉凶'}
+           currentPage === 'fengshui' ? '风水罗盘 · 方位吉凶' :
+           '择日吉时 · 良辰吉日'}
         </p>
         {/* 3D旋转选择器 */}
         <div 
@@ -588,6 +591,8 @@ function App() {
           <DreamInterpretation onBack={() => setCurrentPage('tarot')} />
         ) : currentPage === 'fengshui' ? (
           <FengshuiCompass onBack={() => setCurrentPage('tarot')} />
+        ) : currentPage === 'auspicious' ? (
+          <AuspiciousDate onBack={() => setCurrentPage('tarot')} />
         ) : (
           <>
         {/* 单张牌抽牌动画 */}
