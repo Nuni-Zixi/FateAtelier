@@ -21,6 +21,7 @@ import DreamInterpretation from './components/DreamInterpretation'
 import FengshuiCompass from './components/FengshuiCompass'
 import AuspiciousDate from './components/AuspiciousDate'
 import NumberEnergy from './components/NumberEnergy'
+import LuckyColor from './components/LuckyColor'
 import { getCardIcon, getSuitIcon } from './utils/cardIcons'
 import { generateThreeCardReading } from './utils/readingInterpretation'
 import { downloadReading } from './utils/exportReading'
@@ -43,7 +44,7 @@ function App() {
   const [showReadingTypeSelector, setShowReadingTypeSelector] = useState(false)
   const [selectedReadingType, setSelectedReadingType] = useState<ReadingType>('general')
   const [customQuestion, setCustomQuestion] = useState<string | undefined>(undefined)
-  const [currentPage, setCurrentPage] = useState<'tarot' | 'name' | 'horoscope' | 'almanac' | 'cybermerit' | 'bazi' | 'divination' | 'dream' | 'fengshui' | 'auspicious' | 'numberenergy'>('tarot')
+  const [currentPage, setCurrentPage] = useState<'tarot' | 'name' | 'horoscope' | 'almanac' | 'cybermerit' | 'bazi' | 'divination' | 'dream' | 'fengshui' | 'auspicious' | 'numberenergy' | 'luckycolor'>('tarot')
   const [carouselIndex, setCarouselIndex] = useState(0)
   const [carouselRotation, setCarouselRotation] = useState(0)
   const [touchStart, setTouchStart] = useState(0)
@@ -327,6 +328,7 @@ function App() {
       { page: 'fengshui' as const, icon: '🧭', name: '风水罗盘' },
       { page: 'auspicious' as const, icon: '⏰', name: '择日吉时' },
       { page: 'numberenergy' as const, icon: '🔢', name: '数字能量' },
+      { page: 'luckycolor' as const, icon: '🎨', name: '每日幸运色' },
     ]
   }
 
@@ -371,6 +373,7 @@ function App() {
            currentPage === 'fengshui' ? '风水罗盘 · 方位吉凶' :
            currentPage === 'auspicious' ? '择日吉时 · 良辰吉日' :
            currentPage === 'numberenergy' ? '数字能量 · 数字命理' :
+           currentPage === 'luckycolor' ? '每日幸运色 · 色彩能量' :
            '探索塔罗牌的奥秘'}
         </p>
         {/* 3D旋转选择器 */}
@@ -601,6 +604,8 @@ function App() {
           <AuspiciousDate onBack={() => setCurrentPage('tarot')} />
         ) : currentPage === 'numberenergy' ? (
           <NumberEnergy onBack={() => setCurrentPage('tarot')} />
+        ) : currentPage === 'luckycolor' ? (
+          <LuckyColor onBack={() => setCurrentPage('tarot')} />
         ) : (
           <>
         {/* 单张牌抽牌动画 */}
