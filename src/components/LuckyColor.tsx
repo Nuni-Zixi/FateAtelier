@@ -1,6 +1,28 @@
 import { useMemo, useState, useEffect } from 'react'
 import './LuckyColor.css'
 
+// 天干地支
+const tiangan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸']
+const dizhi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
+
+// 天干地支五行映射
+const tianganWuxing: { [key: string]: string } = {
+  '甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土',
+  '己': '土', '庚': '金', '辛': '金', '壬': '水', '癸': '水'
+}
+
+const dizhiWuxing: { [key: string]: string } = {
+  '子': '水', '丑': '土', '寅': '木', '卯': '木', '辰': '土', '巳': '火',
+  '午': '火', '未': '土', '申': '金', '酉': '金', '戌': '土', '亥': '水'
+}
+
+// 地支对应的生肖
+const dizhiToShengxiao: { [key: string]: string } = {
+  '子': '鼠', '丑': '牛', '寅': '虎', '卯': '兔',
+  '辰': '龙', '巳': '蛇', '午': '马', '未': '羊',
+  '申': '猴', '酉': '鸡', '戌': '狗', '亥': '猪'
+}
+
 interface LuckyColorProps {
   onBack?: () => void
 }
@@ -285,6 +307,379 @@ function generateLuckyColor(date: Date): ColorInfo {
   return colorDatabase[colors[colorIndex]]
 }
 
+// 农历数据表（1900-2100年）
+const lunarInfo = [
+  0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2,
+  0x04ae0, 0x0a5b6, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0, 0x0ada2, 0x095b0, 0x14977,
+  0x04970, 0x0a4b0, 0x0b4b5, 0x06a50, 0x06d40, 0x1ab54, 0x02b60, 0x09570, 0x052f2, 0x04970,
+  0x06566, 0x0d4a0, 0x0ea50, 0x06e95, 0x05ad0, 0x02b60, 0x186e3, 0x092e0, 0x1c8d7, 0x0c950,
+  0x0d4a0, 0x1d8a6, 0x0b550, 0x056a0, 0x1a5b4, 0x025d0, 0x092d0, 0x0d2b2, 0x0a950, 0x0b557,
+  0x06ca0, 0x0b550, 0x15355, 0x04da0, 0x0a5b0, 0x14573, 0x052b0, 0x0a9a8, 0x0e950, 0x06aa0,
+  0x0aea6, 0x0ab50, 0x04b60, 0x0aae4, 0x0a570, 0x05260, 0x0f263, 0x0d950, 0x05b57, 0x056a0,
+  0x096d0, 0x04dd5, 0x04ad0, 0x0a4d0, 0x0d4d4, 0x0d250, 0x0d558, 0x0b540, 0x0b6a0, 0x195a6,
+  0x095b0, 0x049b0, 0x0a974, 0x0a4b0, 0x0b27a, 0x06a50, 0x06d40, 0x0af46, 0x0ab60, 0x09570,
+  0x04af5, 0x04970, 0x064b0, 0x074a3, 0x0ea50, 0x06b58, 0x055c0, 0x0ab60, 0x096d5, 0x092e0,
+  0x0c960, 0x0d954, 0x0d4a0, 0x0da50, 0x07552, 0x056a0, 0x0abb7, 0x025d0, 0x092d0, 0x0cab5,
+  0x0a950, 0x0b4a0, 0x0baa4, 0x0ad50, 0x055d9, 0x04ba0, 0x0a5b0, 0x15176, 0x052b0, 0x0a930,
+  0x07954, 0x06aa0, 0x0ad50, 0x05b52, 0x04b60, 0x0a6e6, 0x0a4e0, 0x0d260, 0x0ea65, 0x0d530,
+  0x05aa0, 0x076a3, 0x096d0, 0x04bd7, 0x04ad0, 0x0a4d0, 0x1d0b6, 0x0d250, 0x0d520, 0x0dd45,
+  0x0b5a0, 0x056d0, 0x055b2, 0x049b0, 0x0a577, 0x0a4b0, 0x0aa50, 0x1b255, 0x06d20, 0x0ada0,
+  0x14b63, 0x09370, 0x049f8, 0x04970, 0x064b0, 0x168a6, 0x0ea50, 0x06b20, 0x1a6c4, 0x0aae0,
+  0x0a2e0, 0x0d2e3, 0x0c960, 0x0d557, 0x0d4a0, 0x0da50, 0x05d55, 0x056a0, 0x0a6d0, 0x055d4,
+  0x052d0, 0x0a9b8, 0x0a950, 0x0b4a0, 0x0b6a6, 0x0ad50, 0x055a0, 0x0aba4, 0x0a5b0, 0x052b0,
+  0x0b273, 0x06930, 0x07337, 0x06aa0, 0x0ad50, 0x14b55, 0x04b60, 0x0a570, 0x054e4, 0x0d160,
+  0x0e968, 0x0d520, 0x0daa0, 0x16aa6, 0x056d0, 0x04ae0, 0x0a9d4, 0x0a2d0, 0x0d150, 0x0f252,
+  0x0d520, 0x0daa0, 0x16aa6, 0x056d0, 0x04ae0, 0x0a9d4, 0x0a2d0, 0x0d150, 0x0f252, 0x0d520,
+  0x0daa0, 0x16aa6, 0x056d0, 0x04ae0, 0x0a9d4, 0x0a2d0, 0x0d150, 0x0f252, 0x0d520, 0x0daa0,
+  0x16aa6, 0x056d0, 0x04ae0, 0x0a9d4, 0x0a2d0, 0x0d150, 0x0f252, 0x0d520, 0x0daa0, 0x16aa6,
+  0x056d0, 0x04ae0, 0x0a9d4, 0x0a2d0, 0x0d150, 0x0f252, 0x0d520, 0x0daa0, 0x16aa6, 0x056d0,
+  0x04ae0, 0x0a9d4, 0x0a2d0, 0x0d150, 0x0f252, 0x0d520, 0x0daa0, 0x16aa6, 0x056d0, 0x04ae0,
+  0x0a9d4, 0x0a2d0, 0x0d150, 0x0f252, 0x0d520, 0x0daa0, 0x16aa6, 0x056d0, 0x04ae0, 0x0a9d4,
+  0x0a2d0, 0x0d150, 0x0f252, 0x0d520, 0x0daa0, 0x16aa6, 0x056d0, 0x04ae0, 0x0a9d4, 0x0a2d0,
+  0x0d150, 0x0f252
+]
+
+// 精确计算节气的日期
+function getSolarTermDate(year: number, termIndex: number): Date {
+  const solarLongitude = [315, 330, 345, 0, 15, 30, 45, 60, 75, 90, 105, 120]
+  const targetLongitude = solarLongitude[termIndex]
+  const springEquinox = new Date(year, 2, 20)
+  const daysFromEquinox = (targetLongitude - 0 + 360) % 360
+  const days = Math.round(daysFromEquinox * 365.2422 / 360)
+  const termDate = new Date(springEquinox)
+  termDate.setDate(termDate.getDate() + days)
+  return termDate
+}
+
+// 计算立春日期
+function getLichunDate(year: number): Date {
+  return getSolarTermDate(year, 0)
+}
+
+// 获取闰月
+function getLeapMonth(year: number): number {
+  const idx = year - 1900
+  if (idx < 0 || idx >= lunarInfo.length) return 0
+  const info = lunarInfo[idx]
+  return info & 0xf
+}
+
+// 获取农历某月的天数
+function getLunarMonthDays(year: number, month: number): number {
+  const idx = year - 1900
+  if (idx < 0 || idx >= lunarInfo.length) return 0
+  const info = lunarInfo[idx]
+  const lm = getLeapMonth(year)
+  if (month > 12) {
+    const base = month - 12
+    if (base !== lm) return 0
+    return (info & (0x10000 >> base)) ? 30 : 29
+  }
+  return (info & (0x10000 >> month)) ? 30 : 29
+}
+
+// 获取农历年的总天数
+function getLunarYearDays(year: number): number {
+  const idx = year - 1900
+  if (idx < 0 || idx >= lunarInfo.length) return 0
+  let sum = 0
+  for (let m = 1; m <= 12; m++) {
+    sum += getLunarMonthDays(year, m)
+  }
+  const lm = getLeapMonth(year)
+  if (lm) {
+    sum += getLunarMonthDays(year, lm + 12)
+  }
+  return sum
+}
+
+// 农历转阳历
+function lunarToSolar(lunarYear: number, lunarMonth: number, lunarDay: number): Date | null {
+  if (lunarYear < 1900 || lunarYear > 2100) return null
+  
+  const yearIndex = lunarYear - 1900
+  if (yearIndex < 0 || yearIndex >= lunarInfo.length) return null
+  
+  const leapMonth = getLeapMonth(lunarYear)
+  const isLeapMonth = lunarMonth > 12
+  const baseMonth = isLeapMonth ? lunarMonth - 12 : lunarMonth
+  
+  if (baseMonth < 1 || baseMonth > 12) return null
+  if (isLeapMonth && baseMonth !== leapMonth) return null
+  
+  const monthDays = getLunarMonthDays(lunarYear, lunarMonth)
+  if (lunarDay < 1 || lunarDay > monthDays) return null
+  
+  let totalDays = 0
+  const baseDate = new Date(1900, 0, 31)
+  
+  for (let y = 1900; y < lunarYear; y++) {
+    totalDays += getLunarYearDays(y)
+  }
+  
+  for (let m = 1; m < baseMonth; m++) {
+    totalDays += getLunarMonthDays(lunarYear, m)
+    if (leapMonth > 0 && m === leapMonth) {
+      totalDays += getLunarMonthDays(lunarYear, leapMonth + 12)
+    }
+  }
+  if (isLeapMonth) totalDays += getLunarMonthDays(lunarYear, baseMonth)
+  
+  totalDays += lunarDay - 1
+  
+  const solarDate = new Date(baseDate)
+  solarDate.setDate(solarDate.getDate() + totalDays)
+  
+  return solarDate
+}
+
+// 计算年柱（根据立春分界）
+function calculateYearPillar(date: Date): string {
+  const year = date.getFullYear()
+  const lichun = getLichunDate(year)
+  
+  let actualYear = year
+  if (date < lichun) {
+    actualYear = year - 1
+  }
+  
+  const ganIndex = (actualYear - 4) % 10
+  const zhiIndex = (actualYear - 4) % 12
+  return tiangan[ganIndex] + dizhi[zhiIndex]
+}
+
+// 精确计算节气对应的月份
+function getJieqiMonth(year: number, month: number, day: number): number {
+  const currentDate = new Date(year, month - 1, day)
+  
+  let actualYear = year
+  const lichunThisYear = getSolarTermDate(year, 0)
+  if (currentDate < lichunThisYear) {
+    actualYear = year - 1
+  }
+  
+  const solarTerms: Date[] = []
+  for (let i = 0; i < 12; i++) {
+    solarTerms.push(getSolarTermDate(actualYear, i))
+  }
+  solarTerms.push(getSolarTermDate(actualYear + 1, 0))
+  
+  for (let i = 0; i < 12; i++) {
+    if (currentDate >= solarTerms[i] && currentDate < solarTerms[i + 1]) {
+      return i + 1
+    }
+  }
+  
+  return 12
+}
+
+// 计算月柱
+function calculateMonthPillar(date: Date, yearPillar: string): string {
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  
+  const jieqiMonth = getJieqiMonth(year, month, day)
+  const monthZhiIndex = (jieqiMonth + 1) % 12
+  const monthZhi = dizhi[monthZhiIndex]
+  
+  const yearGan = yearPillar[0]
+  const yearGanIndex = tiangan.indexOf(yearGan)
+  
+  let monthGanIndex = 0
+  if (yearGanIndex === 0 || yearGanIndex === 5) {
+    monthGanIndex = (2 + jieqiMonth - 1) % 10
+  } else if (yearGanIndex === 1 || yearGanIndex === 6) {
+    monthGanIndex = (4 + jieqiMonth - 1) % 10
+  } else if (yearGanIndex === 2 || yearGanIndex === 7) {
+    monthGanIndex = (6 + jieqiMonth - 1) % 10
+  } else if (yearGanIndex === 3 || yearGanIndex === 8) {
+    monthGanIndex = (8 + jieqiMonth - 1) % 10
+  } else {
+    monthGanIndex = (0 + jieqiMonth - 1) % 10
+  }
+  
+  const monthGan = tiangan[monthGanIndex]
+  return monthGan + monthZhi
+}
+
+// 计算日柱
+function calculateDayPillar(date: Date): string {
+  const baseDate = new Date(1900, 0, 1)
+  const daysDiff = Math.floor((date.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24))
+  const ganIndex = (daysDiff + 6) % 10
+  const zhiIndex = (daysDiff + 8) % 12
+  return tiangan[ganIndex] + dizhi[zhiIndex]
+}
+
+// 分析五行（从八字）
+function analyzeWuxingFromBazi(bazi: string[]): { [key: string]: number } {
+  const wuxingCount: { [key: string]: number } = { '金': 0, '木': 0, '水': 0, '火': 0, '土': 0 }
+  
+  bazi.forEach(pillar => {
+    if (pillar.length >= 2) {
+      const gan = pillar[0]
+      const zhi = pillar[1]
+      if (tianganWuxing[gan]) wuxingCount[tianganWuxing[gan]]++
+      if (dizhiWuxing[zhi]) wuxingCount[dizhiWuxing[zhi]]++
+    }
+  })
+  
+  return wuxingCount
+}
+
+// 根据个人信息生成个性化幸运色
+function generatePersonalizedLuckyColor(
+  queryDate: Date,
+  birthDate?: Date,
+  zodiacSign?: number,
+  shengxiao?: string
+): { color: ColorInfo; reason: string } {
+  const colors = Object.keys(colorDatabase)
+  let scoreMap: { [key: string]: number } = {}
+  
+  // 初始化所有颜色的分数
+  colors.forEach(colorKey => {
+    scoreMap[colorKey] = 0
+  })
+  
+  const reasons: string[] = []
+  
+  // 1. 根据查询日期的基础分数
+  const dateSeed = queryDate.getFullYear() * 10000 + (queryDate.getMonth() + 1) * 100 + queryDate.getDate()
+  const baseColorIndex = dateSeed % colors.length
+  scoreMap[colors[baseColorIndex]] += 30
+  reasons.push(`根据日期 ${queryDate.getFullYear()}年${queryDate.getMonth() + 1}月${queryDate.getDate()}日`)
+  
+  // 2. 根据生肖推荐
+  if (shengxiao) {
+    const shengxiaoColors: { [key: string]: string[] } = {
+      '鼠': ['black', 'silver', 'blue'],
+      '牛': ['brown', 'yellow', 'green'],
+      '虎': ['orange', 'red', 'gold'],
+      '兔': ['pink', 'white', 'green'],
+      '龙': ['gold', 'yellow', 'red'],
+      '蛇': ['purple', 'black', 'red'],
+      '马': ['red', 'orange', 'yellow'],
+      '羊': ['pink', 'white', 'green'],
+      '猴': ['gold', 'yellow', 'orange'],
+      '鸡': ['gold', 'yellow', 'white'],
+      '狗': ['brown', 'yellow', 'red'],
+      '猪': ['pink', 'blue', 'green']
+    }
+    
+    const luckyColors = shengxiaoColors[shengxiao] || []
+    luckyColors.forEach(colorKey => {
+      if (scoreMap[colorKey] !== undefined) {
+        scoreMap[colorKey] += 25
+      }
+    })
+    reasons.push(`生肖${shengxiao}的幸运色`)
+  }
+  
+  // 3. 根据星座推荐
+  if (zodiacSign !== undefined) {
+    const zodiacColors: { [key: number]: string[] } = {
+      0: ['red', 'orange'], // 白羊座 - 火象
+      1: ['green', 'brown', 'pink'], // 金牛座 - 土象
+      2: ['yellow', 'silver', 'blue'], // 双子座 - 风象
+      3: ['silver', 'white', 'blue'], // 巨蟹座 - 水象
+      4: ['gold', 'orange', 'red'], // 狮子座 - 火象
+      5: ['brown', 'green', 'white'], // 处女座 - 土象
+      6: ['pink', 'blue', 'green'], // 天秤座 - 风象
+      7: ['black', 'red', 'purple'], // 天蝎座 - 水象
+      8: ['purple', 'red', 'orange'], // 射手座 - 火象
+      9: ['brown', 'black', 'green'], // 摩羯座 - 土象
+      10: ['blue', 'silver', 'white'], // 水瓶座 - 风象
+      11: ['teal', 'blue', 'purple'] // 双鱼座 - 水象
+    }
+    
+    const luckyColors = zodiacColors[zodiacSign] || []
+    luckyColors.forEach(colorKey => {
+      if (scoreMap[colorKey] !== undefined) {
+        scoreMap[colorKey] += 25
+      }
+    })
+    
+    const zodiacNames = ['白羊座', '金牛座', '双子座', '巨蟹座', '狮子座', '处女座', '天秤座', '天蝎座', '射手座', '摩羯座', '水瓶座', '双鱼座']
+    reasons.push(`星座${zodiacNames[zodiacSign]}的幸运色`)
+  }
+  
+  // 4. 根据出生日期计算五行（完整版：使用八字）
+  if (birthDate) {
+    // 计算八字
+    const yearPillar = calculateYearPillar(birthDate)
+    const monthPillar = calculateMonthPillar(birthDate, yearPillar)
+    const dayPillar = calculateDayPillar(birthDate)
+    const bazi = [yearPillar, monthPillar, dayPillar]
+    
+    // 分析五行
+    const wuxingCount = analyzeWuxingFromBazi(bazi)
+    
+    // 找出最多的五行和日主五行
+    const dayGan = dayPillar[0]
+    const dayWuxing = tianganWuxing[dayGan] || '土'
+    
+    // 找出最多的五行
+    const maxWuxing = Object.entries(wuxingCount).reduce((a, b) => 
+      wuxingCount[a[0]] > wuxingCount[b[0]] ? a : b
+    )[0]
+    
+    const wuxingColors: { [key: string]: string[] } = {
+      '金': ['gold', 'silver', 'white'],
+      '木': ['green', 'teal', 'brown'],
+      '水': ['blue', 'teal', 'black'],
+      '火': ['red', 'orange', 'purple', 'pink'],
+      '土': ['brown', 'yellow', 'gold']
+    }
+    
+    // 优先使用日主五行，如果日主五行较弱，则使用最多的五行
+    const dominantWuxing = wuxingCount[dayWuxing] >= 2 ? dayWuxing : maxWuxing
+    const luckyColors = wuxingColors[dominantWuxing] || []
+    
+    luckyColors.forEach(colorKey => {
+      if (scoreMap[colorKey] !== undefined) {
+        scoreMap[colorKey] += 20
+      }
+    })
+    
+    reasons.push(`八字五行${dominantWuxing}的幸运色（日主：${dayWuxing}）`)
+  }
+  
+  // 找到分数最高的颜色
+  let maxScore = 0
+  let bestColor = colors[baseColorIndex]
+  
+  Object.entries(scoreMap).forEach(([colorKey, score]) => {
+    if (score > maxScore) {
+      maxScore = score
+      bestColor = colorKey
+    }
+  })
+  
+  return {
+    color: colorDatabase[bestColor],
+    reason: reasons.join(' + ')
+  }
+}
+
+// 根据阳历日期计算星座
+function getZodiacSignByDate(month: number, day: number): number {
+  if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return 9 // 摩羯座
+  if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return 10 // 水瓶座
+  if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return 11 // 双鱼座
+  if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return 0 // 白羊座
+  if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return 1 // 金牛座
+  if ((month === 5 && day >= 21) || (month === 6 && day <= 21)) return 2 // 双子座
+  if ((month === 6 && day >= 22) || (month === 7 && day <= 22)) return 3 // 巨蟹座
+  if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return 4 // 狮子座
+  if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return 5 // 处女座
+  if ((month === 9 && day >= 23) || (month === 10 && day <= 23)) return 6 // 天秤座
+  if ((month === 10 && day >= 24) || (month === 11 && day <= 22)) return 7 // 天蝎座
+  if ((month === 11 && day >= 23) || (month === 12 && day <= 21)) return 8 // 射手座
+  return 0
+}
+
 // 获取今日的辅助色（与主色搭配）
 function getSecondaryColor(mainColor: ColorInfo): ColorInfo {
   const compatible = mainColor.compatibleColors
@@ -305,7 +700,74 @@ function getSecondaryColor(mainColor: ColorInfo): ColorInfo {
 
 function LuckyColor({ onBack: _onBack }: LuckyColorProps) {
   const today = new Date()
-  const luckyColor = useMemo(() => generateLuckyColor(today), [])
+  const [selectedDate, setSelectedDate] = useState<Date>(today)
+  const [dateInput, setDateInput] = useState<string>('')
+  
+  // 个人信息
+  const [calendarType, setCalendarType] = useState<'solar' | 'lunar'>('solar')
+  const [birthDate, setBirthDate] = useState<string>('')
+  const [lunarYear, setLunarYear] = useState<string>('')
+  const [lunarMonth, setLunarMonth] = useState<string>('')
+  const [lunarDay, setLunarDay] = useState<string>('')
+  const [isLunarLeapMonth, setIsLunarLeapMonth] = useState(false)
+  const [zodiacSign, setZodiacSign] = useState<number | undefined>(undefined)
+  const [shengxiao, setShengxiao] = useState<string>('')
+  const [usePersonalized, setUsePersonalized] = useState(false)
+  
+  // 计算个性化幸运色
+  const personalizedResult = useMemo(() => {
+    if (!usePersonalized) return null
+    
+    let birth: Date | undefined
+    
+    if (calendarType === 'solar') {
+      if (birthDate) {
+        const date = new Date(birthDate)
+        if (!isNaN(date.getTime())) {
+          birth = date
+        }
+      }
+    } else {
+      // 农历
+      if (lunarYear && lunarMonth && lunarDay) {
+        const year = parseInt(lunarYear)
+        const month = parseInt(lunarMonth)
+        const day = parseInt(lunarDay)
+        
+        if (!isNaN(year) && !isNaN(month) && !isNaN(day) && year >= 1900 && year <= 2100) {
+          const lunarMonthParam = isLunarLeapMonth ? month + 12 : month
+          const solarDate = lunarToSolar(year, lunarMonthParam, day)
+          if (solarDate) {
+            birth = solarDate
+          }
+        }
+      }
+    }
+    
+    let zodiac: number | undefined = zodiacSign
+    if (birth && zodiac === undefined) {
+      // 自动计算星座
+      zodiac = getZodiacSignByDate(birth.getMonth() + 1, birth.getDate())
+    }
+    
+    let sx: string | undefined = shengxiao || undefined
+    if (birth && !sx) {
+      // 自动计算生肖（从年柱）
+      const yearPillar = calculateYearPillar(birth)
+      const yearZhi = yearPillar[1]
+      sx = dizhiToShengxiao[yearZhi]
+    }
+    
+    return generatePersonalizedLuckyColor(selectedDate, birth, zodiac, sx)
+  }, [selectedDate, calendarType, birthDate, lunarYear, lunarMonth, lunarDay, isLunarLeapMonth, zodiacSign, shengxiao, usePersonalized])
+  
+  const luckyColor = useMemo(() => {
+    if (personalizedResult) {
+      return personalizedResult.color
+    }
+    return generateLuckyColor(selectedDate)
+  }, [selectedDate, personalizedResult])
+  
   const secondaryColor = useMemo(() => getSecondaryColor(luckyColor), [luckyColor])
   const [copiedHex, setCopiedHex] = useState<string | null>(null)
   const [showDetails, setShowDetails] = useState(false)
@@ -313,7 +775,7 @@ function LuckyColor({ onBack: _onBack }: LuckyColorProps) {
   
   // 获取当前时段
   useEffect(() => {
-    const hour = today.getHours()
+    const hour = selectedDate.getHours()
     if (hour >= 6 && hour < 9) {
       setCurrentTimeSlot('早晨 (6-9点)')
     } else if (hour >= 9 && hour < 12) {
@@ -323,7 +785,79 @@ function LuckyColor({ onBack: _onBack }: LuckyColorProps) {
     } else {
       setCurrentTimeSlot('晚上 (18-24点)')
     }
-  }, [today])
+  }, [selectedDate])
+  
+  // 初始化日期输入框
+  useEffect(() => {
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const day = String(today.getDate()).padStart(2, '0')
+    setDateInput(`${year}-${month}-${day}`)
+  }, [])
+  
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setDateInput(value)
+    if (value) {
+      const newDate = new Date(value)
+      if (!isNaN(newDate.getTime())) {
+        setSelectedDate(newDate)
+      }
+    }
+  }
+  
+  const resetToToday = () => {
+    setSelectedDate(today)
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const day = String(today.getDate()).padStart(2, '0')
+    setDateInput(`${year}-${month}-${day}`)
+  }
+  
+  const handleBirthDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setBirthDate(value)
+    if (value) {
+      const date = new Date(value)
+      if (!isNaN(date.getTime())) {
+        // 自动计算星座
+        const zodiac = getZodiacSignByDate(date.getMonth() + 1, date.getDate())
+        setZodiacSign(zodiac)
+        
+        // 自动计算生肖（阳历按年柱计算，考虑立春分界）
+        const yearPillar = calculateYearPillar(date)
+        const yearZhi = yearPillar[1]
+        setShengxiao(dizhiToShengxiao[yearZhi] || '')
+      }
+    }
+  }
+  
+  // 当农历日期改变时自动计算
+  useEffect(() => {
+    if (calendarType === 'lunar' && lunarYear && lunarMonth && lunarDay) {
+      const year = parseInt(lunarYear)
+      const month = parseInt(lunarMonth)
+      const day = parseInt(lunarDay)
+      
+      if (!isNaN(year) && !isNaN(month) && !isNaN(day) && year >= 1900 && year <= 2100) {
+        // 生肖直接根据农历年份计算（不按立春分界）
+        const shengxiaoIndex = (year - 4) % 12
+        const shengxiaoList = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪']
+        setShengxiao(shengxiaoList[shengxiaoIndex])
+        
+        const lunarMonthParam = isLunarLeapMonth ? month + 12 : month
+        const solarDate = lunarToSolar(year, lunarMonthParam, day)
+        if (solarDate) {
+          // 自动计算星座
+          const zodiac = getZodiacSignByDate(solarDate.getMonth() + 1, solarDate.getDate())
+          setZodiacSign(zodiac)
+        }
+      }
+    }
+  }, [lunarYear, lunarMonth, lunarDay, isLunarLeapMonth, calendarType])
+  
+  const shengxiaoList = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪']
+  const zodiacNames = ['白羊座', '金牛座', '双子座', '巨蟹座', '狮子座', '处女座', '天秤座', '天蝎座', '射手座', '摩羯座', '水瓶座', '双鱼座']
   
   const formatDate = (date: Date) => {
     const year = date.getFullYear()
@@ -367,14 +901,164 @@ function LuckyColor({ onBack: _onBack }: LuckyColorProps) {
     return slot ? slot.hex : luckyColor.hex
   }
 
+  const isToday = selectedDate.toDateString() === today.toDateString()
+  
   return (
     <div className="lucky-color">
       <div className="lucky-color-header">
         <h2>🎨 每日幸运色</h2>
       </div>
 
-      <div className="lucky-color-date">
-        {formatDate(today)}
+      <div className="personal-info-section">
+        <div className="personal-info-toggle">
+          <label className="toggle-label">
+            <input
+              type="checkbox"
+              checked={usePersonalized}
+              onChange={(e) => setUsePersonalized(e.target.checked)}
+            />
+            <span>使用个人信息推荐</span>
+          </label>
+        </div>
+        
+        {usePersonalized && (
+          <div className="personal-info-form">
+            <div className="info-item">
+              <label>历法类型：</label>
+              <div className="calendar-type-selector">
+                <button
+                  className={`calendar-type-btn ${calendarType === 'solar' ? 'active' : ''}`}
+                  onClick={() => setCalendarType('solar')}
+                >
+                  阳历
+                </button>
+                <button
+                  className={`calendar-type-btn ${calendarType === 'lunar' ? 'active' : ''}`}
+                  onClick={() => setCalendarType('lunar')}
+                >
+                  农历
+                </button>
+              </div>
+            </div>
+            
+            {calendarType === 'solar' ? (
+              <div className="info-item">
+                <label htmlFor="birth-date">出生日期（阳历）：</label>
+                <input
+                  id="birth-date"
+                  type="date"
+                  value={birthDate}
+                  onChange={handleBirthDateChange}
+                  className="date-input"
+                  max={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+            ) : (
+              <div className="info-item">
+                <label>出生日期（农历）：</label>
+                <div className="lunar-date-inputs">
+                  <input
+                    type="number"
+                    placeholder="年"
+                    value={lunarYear}
+                    onChange={(e) => setLunarYear(e.target.value)}
+                    className="lunar-input"
+                    min="1900"
+                    max="2100"
+                  />
+                  <span>年</span>
+                  <input
+                    type="number"
+                    placeholder="月"
+                    value={lunarMonth}
+                    onChange={(e) => setLunarMonth(e.target.value)}
+                    className="lunar-input"
+                    min="1"
+                    max="12"
+                  />
+                  <span>月</span>
+                  <input
+                    type="number"
+                    placeholder="日"
+                    value={lunarDay}
+                    onChange={(e) => setLunarDay(e.target.value)}
+                    className="lunar-input"
+                    min="1"
+                    max="30"
+                  />
+                  <span>日</span>
+                  <label className="leap-month-label">
+                    <input
+                      type="checkbox"
+                      checked={isLunarLeapMonth}
+                      onChange={(e) => setIsLunarLeapMonth(e.target.checked)}
+                    />
+                    <span>闰月</span>
+                  </label>
+                </div>
+              </div>
+            )}
+            
+            <div className="info-item">
+              <label>生肖：</label>
+              <div className="shengxiao-selector">
+                {shengxiaoList.map(sx => (
+                  <button
+                    key={sx}
+                    className={`shengxiao-btn ${shengxiao === sx ? 'active' : ''}`}
+                    onClick={() => setShengxiao(sx)}
+                  >
+                    {sx}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div className="info-item">
+              <label>星座：</label>
+              <div className="zodiac-selector">
+                {zodiacNames.map((name, index) => (
+                  <button
+                    key={index}
+                    className={`zodiac-btn ${zodiacSign === index ? 'active' : ''}`}
+                    onClick={() => setZodiacSign(index)}
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="lucky-color-date-section">
+        <div className="date-selector">
+          <label htmlFor="date-input">查询日期：</label>
+          <input
+            id="date-input"
+            type="date"
+            value={dateInput}
+            onChange={handleDateChange}
+            className="date-input"
+            max={new Date().toISOString().split('T')[0]}
+          />
+          {!isToday && (
+            <button className="reset-today-btn" onClick={resetToToday}>
+              回到今天
+            </button>
+          )}
+        </div>
+        <div className="lucky-color-date">
+          {formatDate(selectedDate)}
+          {isToday && <span className="today-badge">今天</span>}
+        </div>
+        {personalizedResult && (
+          <div className="personalized-reason">
+            <span className="reason-label">推荐理由：</span>
+            <span className="reason-text">{personalizedResult.reason}</span>
+          </div>
+        )}
       </div>
 
       <div className="color-display-section">
