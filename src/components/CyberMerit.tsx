@@ -16,7 +16,7 @@ interface FloatingText {
   type: 'merit' | 'message' | 'milestone'
 }
 
-function CyberMerit({ onBack }: CyberMeritProps) {
+function CyberMerit({ onBack: _onBack }: CyberMeritProps) {
   const [activeGame, setActiveGame] = useState<GameType>('woodfish')
   const [woodfishCount, setWoodfishCount] = useState(0)
   const [releaseCount, setReleaseCount] = useState(0)
@@ -450,9 +450,6 @@ function CyberMerit({ onBack }: CyberMeritProps) {
     <div className="cyber-merit">
       <div className="cyber-merit-header">
         <h2>🙏 赛博积德</h2>
-        {onBack && (
-          <button className="back-btn" onClick={onBack}>← 返回</button>
-        )}
       </div>
 
       <div className="merit-stats">

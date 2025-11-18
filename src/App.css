@@ -309,11 +309,13 @@
   cursor: pointer;
   transition: transform 0.3s ease;
   z-index: 1;
+  will-change: transform;
 }
 
 .carousel-item.center {
-  z-index: 10;
+  z-index: 100;
   isolation: isolate;
+  transform-style: preserve-3d;
 }
 
 .carousel-item.center .feature-card {
@@ -321,9 +323,14 @@
   background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-major) 100%);
   border-color: var(--color-accent);
   box-shadow: 0 8px 30px rgba(233, 69, 96, 0.5);
-  z-index: 10;
+  z-index: 100;
   position: relative;
   isolation: isolate;
+  transform-style: preserve-3d;
+}
+
+.carousel-item:not(.center) {
+  z-index: 1;
 }
 
 .carousel-item:not(.center) .feature-card {
@@ -331,6 +338,7 @@
   filter: blur(2px);
   z-index: 1;
   position: relative;
+  transform-style: preserve-3d;
 }
 
 .carousel-container {

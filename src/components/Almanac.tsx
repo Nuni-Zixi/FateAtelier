@@ -345,7 +345,7 @@ interface AlmanacProps {
   onBack?: () => void
 }
 
-function Almanac({ onBack }: AlmanacProps) {
+function Almanac({ onBack: _onBack }: AlmanacProps) {
   const today = new Date()
   const almanac = useMemo(() => generateAlmanac(today), [])
   
@@ -362,9 +362,6 @@ function Almanac({ onBack }: AlmanacProps) {
     <div className="almanac">
       <div className="almanac-header">
         <h2>📅 今日黄历</h2>
-        {onBack && (
-          <button className="back-btn" onClick={onBack}>← 返回</button>
-        )}
       </div>
 
       <div className="almanac-date">

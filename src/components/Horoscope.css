@@ -2,13 +2,11 @@
   max-width: 980px;
   margin: 0 auto;
   padding: 16px;
+  position: relative;
 }
 
 .horoscope-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  text-align: center;
   margin-bottom: 12px;
 }
 
@@ -18,14 +16,23 @@
 }
 
 .back-btn {
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 1px solid #444;
-  background: #222;
-  color: #eee;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: rgba(15, 52, 96, 0.5);
+  color: var(--color-text, #eee);
+  border: 1px solid var(--color-border, #444);
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+  font-size: 1rem;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
-.back-btn:hover { background: #2a2a2a; }
+
+.back-btn:hover {
+  background: rgba(15, 52, 96, 0.7);
+  transform: translateX(-5px);
+}
 
 .horoscope-controls {
   display: flex;
@@ -274,9 +281,8 @@
     font-size: 20px;
   }
 
-  .back-btn {
-    padding: 6px 10px;
-    font-size: 14px;
+  .horoscope-header h2 {
+    font-size: 18px;
   }
 
   .signs-scroll {
@@ -354,6 +360,12 @@
 
   .horoscope-header h2 {
     font-size: 18px;
+  }
+
+  .back-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
   }
 
   .signs-scroll {

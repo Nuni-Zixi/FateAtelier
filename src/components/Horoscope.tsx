@@ -404,7 +404,7 @@ interface HoroscopeProps {
   onBack?: () => void
 }
 
-function Horoscope({ onBack }: HoroscopeProps) {
+function Horoscope({ onBack: _onBack }: HoroscopeProps) {
   const [period, setPeriod] = useState<Period>('today')
   const [signIndex, setSignIndex] = useState<number>(0)
   const [calendarType, setCalendarType] = useState<CalendarType>('solar')
@@ -473,9 +473,6 @@ function Horoscope({ onBack }: HoroscopeProps) {
     <div className="horoscope">
       <div className="horoscope-header">
         <h2>{sign.icon} {sign.name} · 星座运势</h2>
-        {onBack && (
-          <button className="back-btn" onClick={onBack}>← 返回</button>
-        )}
       </div>
 
       {/* 生日查询区域 */}

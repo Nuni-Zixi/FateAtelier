@@ -535,12 +535,14 @@ function App() {
               {getFilteredFeatures().map((feature, index) => {
                 const isCenter = index === carouselIndex
                 const angle = (360 / Math.max(1, getFilteredFeatures().length)) * index
+                // 中间卡片更靠前，避免穿透
+                const translateZ = isCenter ? 450 : 400
                 return (
                   <div
                     key={feature.page}
                     className={`carousel-item ${isCenter ? 'center' : ''}`}
                     style={{
-                      transform: `rotateY(${angle}deg) translateZ(400px)`
+                      transform: `rotateY(${angle}deg) translateZ(${translateZ}px)`
                     }}
                     onClick={() => {
                       const features = getFilteredFeatures()
