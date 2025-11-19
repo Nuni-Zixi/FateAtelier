@@ -23,6 +23,7 @@ import FengshuiCompass from './components/FengshuiCompass'
 import AuspiciousDate from './components/AuspiciousDate'
 import NumberEnergy from './components/NumberEnergy'
 import LuckyColor from './components/LuckyColor'
+import QimenDunjia from './components/QimenDunjia'
 import { getCardIcon, getSuitIcon } from './utils/cardIcons'
 import { generateThreeCardReading } from './utils/readingInterpretation'
 import { downloadReading } from './utils/exportReading'
@@ -45,7 +46,7 @@ function App() {
   const [showReadingTypeSelector, setShowReadingTypeSelector] = useState(false)
   const [selectedReadingType, setSelectedReadingType] = useState<ReadingType>('general')
   const [customQuestion, setCustomQuestion] = useState<string | undefined>(undefined)
-  const [currentPage, setCurrentPage] = useState<'tarot' | 'name' | 'horoscope' | 'almanac' | 'cybermerit' | 'bazi' | 'divination' | 'dream' | 'fengshui' | 'auspicious' | 'numberenergy' | 'luckycolor'>('tarot')
+  const [currentPage, setCurrentPage] = useState<'tarot' | 'name' | 'horoscope' | 'almanac' | 'cybermerit' | 'bazi' | 'divination' | 'dream' | 'fengshui' | 'auspicious' | 'numberenergy' | 'luckycolor' | 'qimen'>('tarot')
   const [carouselIndex, setCarouselIndex] = useState(0)
   const [carouselRotation, setCarouselRotation] = useState(0)
   const [touchStart, setTouchStart] = useState(0)
@@ -330,6 +331,7 @@ function App() {
       { page: 'auspicious' as const, icon: '⏰', name: '择日吉时' },
       { page: 'numberenergy' as const, icon: '🔢', name: '数字能量' },
       { page: 'luckycolor' as const, icon: '🎨', name: '每日幸运色' },
+      { page: 'qimen' as const, icon: '⚡', name: '奇门遁甲' },
     ]
   }
 
@@ -375,6 +377,7 @@ function App() {
            currentPage === 'auspicious' ? '择日吉时 · 良辰吉日' :
            currentPage === 'numberenergy' ? '数字能量 · 数字命理' :
            currentPage === 'luckycolor' ? '每日幸运色 · 色彩能量' :
+           currentPage === 'qimen' ? '奇门遁甲 · 传统预测术' :
            '探索塔罗牌的奥秘'}
         </p>
         {/* 3D旋转选择器 */}
@@ -607,6 +610,8 @@ function App() {
           <NumberEnergy onBack={() => setCurrentPage('tarot')} />
         ) : currentPage === 'luckycolor' ? (
           <LuckyColor onBack={() => setCurrentPage('tarot')} />
+        ) : currentPage === 'qimen' ? (
+          <QimenDunjia onBack={() => setCurrentPage('tarot')} />
         ) : (
           <>
         {/* 单张牌抽牌动画 */}
