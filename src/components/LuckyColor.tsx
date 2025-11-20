@@ -1,8 +1,8 @@
 import { useMemo, useState, useEffect } from 'react'
 import './LuckyColor.css'
-import { tiangan, dizhi, tianganWuxing, dizhiWuxing, dizhiToShengxiao } from '../utils/constants'
-import { lunarToSolar, getSolarTermDate, getLichunDate } from '../utils/lunarCalendar'
-import { calculateYearPillar, calculateMonthPillar, calculateDayPillar, getJieqiMonth, analyzeWuxingFromBazi } from '../utils/bazi'
+import { tianganWuxing, dizhiToShengxiao } from '../utils/constants'
+import { lunarToSolar } from '../utils/lunarCalendar'
+import { calculateYearPillar, calculateMonthPillar, calculateDayPillar, analyzeWuxingFromBazi } from '../utils/bazi'
 
 interface LuckyColorProps {
   onBack?: () => void
