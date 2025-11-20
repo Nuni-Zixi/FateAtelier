@@ -24,6 +24,7 @@ import AuspiciousDate from './components/AuspiciousDate'
 import NumberEnergy from './components/NumberEnergy'
 import LuckyColor from './components/LuckyColor'
 import QimenDunjia from './components/QimenDunjia'
+import NameTest from './components/NameTest'
 import { getCardIcon, getSuitIcon } from './utils/cardIcons'
 import { generateThreeCardReading } from './utils/readingInterpretation'
 import { downloadReading } from './utils/exportReading'
@@ -46,7 +47,7 @@ function App() {
   const [showReadingTypeSelector, setShowReadingTypeSelector] = useState(false)
   const [selectedReadingType, setSelectedReadingType] = useState<ReadingType>('general')
   const [customQuestion, setCustomQuestion] = useState<string | undefined>(undefined)
-  const [currentPage, setCurrentPage] = useState<'tarot' | 'name' | 'horoscope' | 'almanac' | 'cybermerit' | 'bazi' | 'divination' | 'dream' | 'fengshui' | 'auspicious' | 'numberenergy' | 'luckycolor' | 'qimen'>('tarot')
+  const [currentPage, setCurrentPage] = useState<'tarot' | 'name' | 'horoscope' | 'almanac' | 'cybermerit' | 'bazi' | 'divination' | 'dream' | 'fengshui' | 'auspicious' | 'numberenergy' | 'luckycolor' | 'qimen' | 'nametest'>('tarot')
   const [carouselIndex, setCarouselIndex] = useState(0)
   const [carouselRotation, setCarouselRotation] = useState(0)
   const [touchStart, setTouchStart] = useState(0)
@@ -332,6 +333,7 @@ function App() {
       { page: 'numberenergy' as const, icon: '🔢', name: '数字能量' },
       { page: 'luckycolor' as const, icon: '🎨', name: '每日幸运色' },
       { page: 'qimen' as const, icon: '⚡', name: '奇门遁甲' },
+      { page: 'nametest' as const, icon: '📝', name: '姓名测试' },
     ]
   }
 
@@ -378,6 +380,7 @@ function App() {
            currentPage === 'numberenergy' ? '数字能量 · 数字命理' :
            currentPage === 'luckycolor' ? '每日幸运色 · 色彩能量' :
            currentPage === 'qimen' ? '奇门遁甲 · 传统预测术' :
+           currentPage === 'nametest' ? '姓名测试 · 五格数理' :
            '探索塔罗牌的奥秘'}
         </p>
         {/* 3D旋转选择器 */}
@@ -612,6 +615,8 @@ function App() {
           <LuckyColor onBack={() => setCurrentPage('tarot')} />
         ) : currentPage === 'qimen' ? (
           <QimenDunjia onBack={() => setCurrentPage('tarot')} />
+        ) : currentPage === 'nametest' ? (
+          <NameTest onBack={() => setCurrentPage('tarot')} />
         ) : (
           <>
         {/* 单张牌抽牌动画 */}
