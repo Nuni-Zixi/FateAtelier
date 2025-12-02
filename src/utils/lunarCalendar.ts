@@ -177,3 +177,84 @@ export function getLichunDate(year: number): Date {
   return getSolarTermDate(year, 0)
 }
 
+/**
+ * 阳历转农历
+ * @param date 阳历日期
+ * @returns 农历日期 {year, month, day, isLeapMonth}，转换失败返回null
+ */
+export function solarToLunar(date: Date): { year: number, month: number, day: number, isLeapMonth: boolean } | null {
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  
+  if (year < 1900 || year > 2100) {
+    return null
+  }
+  
+  // 计算从1900年1月31日（农历正月初一）到目标日期的总天数
+  const baseDate = new Date(1900, 0, 31)
+  const targetDate = new Date(year, month - 1, day)
+  const daysDiff = Math.floor((targetDate.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24))
+  
+  if (daysDiff < 0) {
+    return null
+  }
+  
+  // 从1900年开始，逐年累加天数，找到对应的农历年份
+  let lunarYear = 1900
+  let remainingDays = daysDiff
+  
+  while (lunarYear <= 2100) {
+    const yearDays = getLunarYearDays(lunarYear)
+    if (remainingDays < yearDays) {
+      break
+    }
+    remainingDays -= yearDays
+    lunarYear++
+  }
+  
+  if (lunarYear > 2100) {
+    return null
+  }
+  
+  // 在找到的年份中，逐月累加天数，找到对应的农历月份
+  const leapMonth = getLeapMonth(lunarYear)
+  let lunarMonth = 1
+  let isLeapMonth = false
+  
+  while (lunarMonth <= 12) {
+    // 先检查是否在闰月中（闰月在该平月之后）
+    if (leapMonth > 0 && lunarMonth === leapMonth) {
+      const leapMonthDays = getLunarMonthDays(lunarYear, leapMonth + 12)
+      if (remainingDays < leapMonthDays) {
+        // 在闰月中
+        isLeapMonth = true
+        break
+      }
+      remainingDays -= leapMonthDays
+    }
+    
+    // 检查是否在当前平月中
+    const monthDays = getLunarMonthDays(lunarYear, lunarMonth)
+    if (remainingDays < monthDays) {
+      break
+    }
+    remainingDays -= monthDays
+    lunarMonth++
+  }
+  
+  if (lunarMonth > 12) {
+    return null
+  }
+  
+  // 剩余天数+1就是农历日期
+  const lunarDay = remainingDays + 1
+  
+  return {
+    year: lunarYear,
+    month: lunarMonth,
+    day: lunarDay,
+    isLeapMonth
+  }
+}
+
