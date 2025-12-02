@@ -239,6 +239,51 @@ const placeMinorStars = (
   if (!stars[jieshenPos]) stars[jieshenPos] = []
   stars[jieshenPos].push('解神')
   
+  // 华盖：根据农历年份（年支）
+  const huagaiPos = (lunarYearZhiIndex + 2) % 12
+  if (!stars[huagaiPos]) stars[huagaiPos] = []
+  stars[huagaiPos].push('华盖')
+  
+  // 咸池：根据农历年份（年支）
+  const xianchiPos = (lunarYearZhiIndex + 9) % 12
+  if (!stars[xianchiPos]) stars[xianchiPos] = []
+  stars[xianchiPos].push('咸池')
+  
+  // 大耗：根据农历年份（年支）
+  const dahaoPos = (lunarYearZhiIndex + 7) % 12
+  if (!stars[dahaoPos]) stars[dahaoPos] = []
+  stars[dahaoPos].push('大耗')
+  
+  // 小耗：根据农历年份（年支）
+  const xiaohaoPos = (lunarYearZhiIndex + 1) % 12
+  if (!stars[xiaohaoPos]) stars[xiaohaoPos] = []
+  stars[xiaohaoPos].push('小耗')
+  
+  // 岁建：根据农历年份（年支，与年支相同）
+  const suijianPos = lunarYearZhiIndex
+  if (!stars[suijianPos]) stars[suijianPos] = []
+  stars[suijianPos].push('岁建')
+  
+  // 岁破：根据农历年份（年支，与岁建相对）
+  const suipoPos = (lunarYearZhiIndex + 6) % 12
+  if (!stars[suipoPos]) stars[suipoPos] = []
+  stars[suipoPos].push('岁破')
+  
+  // 龙德：根据农历年份（年支）
+  const longdePos = (lunarYearZhiIndex + 8) % 12
+  if (!stars[longdePos]) stars[longdePos] = []
+  stars[longdePos].push('龙德')
+  
+  // 白虎：根据农历年份（年支）
+  const baihuPos = (lunarYearZhiIndex + 10) % 12
+  if (!stars[baihuPos]) stars[baihuPos] = []
+  stars[baihuPos].push('白虎')
+  
+  // 天狗：根据农历年份（年支）
+  const tiangouPos = (lunarYearZhiIndex + 4) % 12
+  if (!stars[tiangouPos]) stars[tiangouPos] = []
+  stars[tiangouPos].push('天狗')
+  
   return stars
 }
 
@@ -424,8 +469,8 @@ function ZiweiDoushu({ onBack }: ZiweiDoushuProps) {
     let date: Date | null = null
     let actualLunarMonth = 1
     let actualLunarDay = 1
-    // 保留农历年份以备将来扩展使用（如某些特殊星曜的计算）
-    let _actualLunarYear = 2000
+    // 农历年份（用于计算特殊星曜）
+    let actualLunarYear = 2000
     let isLeapMonth = false
 
     if (calendarType === 'solar') {
@@ -445,7 +490,7 @@ function ZiweiDoushu({ onBack }: ZiweiDoushuProps) {
         alert('阳历转农历失败，请检查输入的日期是否正确（支持1900-2100年）')
         return
       }
-      _actualLunarYear = lunar.year
+      actualLunarYear = lunar.year
       actualLunarMonth = lunar.month
       actualLunarDay = lunar.day
       isLeapMonth = lunar.isLeapMonth
@@ -469,7 +514,7 @@ function ZiweiDoushu({ onBack }: ZiweiDoushuProps) {
         return
       }
 
-      _actualLunarYear = year
+      actualLunarYear = year
       actualLunarMonth = month
       actualLunarDay = day
       isLeapMonth = isLunarLeapMonth
@@ -515,7 +560,7 @@ function ZiweiDoushu({ onBack }: ZiweiDoushuProps) {
     }
     
     // 安辅星（使用农历年份计算特殊星曜）
-    const minorStarsMap = placeMinorStars(yearPillar, dayPillar, _actualLunarYear)
+    const minorStarsMap = placeMinorStars(yearPillar, dayPillar, actualLunarYear)
     
     // 计算四化
     const sihua = calculateSihua(yearGan)
