@@ -1,7 +1,7 @@
 {
   "name": "fate-atelier",
   "version": "1.0.0",
-  "description": "一个精美的塔罗牌占卜应用",
+  "description": "一个精美的综合占卜与命理 Web 应用，集成了多种传统和现代占卜方式，包括塔罗牌、八字算命、紫微斗数、姓名测试、生肖配对、奇门遁甲、风水罗盘等功能",
   "type": "module",
   "scripts": {
     "dev": "vite",
