@@ -372,29 +372,57 @@ function placeBamen(zhiShi: number, shiZhi: string): string[] {
   return positions
 }
 
-// 排八神（根据值符）
-function placeBashen(zhiFu: number): string[] {
+// 排八神（根据值符星所在宫位）
+function placeBashen(zhiFuStarPalace: number): string[] {
   const positions: string[] = new Array(9).fill('')
   
-  // 值符在中宫
-  positions[4] = bashen[0] // 值符
-  
-  // 八神顺序：值符(0), 腾蛇(1), 太阴(2), 六合(3), 白虎(4), 玄武(5), 九地(6), 九天(7)
-  // 值符所在宫位对应值符星所在宫位
-  const zhiFuPalace = (zhiFu + 1) % 9
-  if (zhiFuPalace !== 4) {
-    positions[zhiFuPalace] = bashen[0] // 值符
+  // 值符神跟随值符星所在宫位
+  // 如果值符星在中宫，值符神也在中宫
+  if (zhiFuStarPalace === 4) {
+    positions[4] = bashen[0] // 值符
+  } else {
+    // 值符神在值符星所在宫位
+    positions[zhiFuStarPalace] = bashen[0] // 值符
+    // 中宫放置值符（值符神同时在中宫和值符星宫位）
+    positions[4] = bashen[0] // 值符
   }
   
-  // 其他神按顺序排列
-  let shenIdx = 1
-  for (let i = 0; i < 9; i++) {
-    if (i === 4) continue // 中宫已确定
-    if (positions[i]) continue
+  // 八神顺序：值符(0), 腾蛇(1), 太阴(2), 六合(3), 白虎(4), 玄武(5), 九地(6), 九天(7)
+  // 从值符星所在宫位开始，按照固定顺序排列其他神
+  // 排列顺序：值符星宫位 -> 顺时针排列（八神排列固定为顺时针）
+  
+  // 确定起始宫位（值符星所在宫位）
+  let startPalace = zhiFuStarPalace
+  if (startPalace === 4) {
+    // 如果值符星在中宫，从坎宫（7）开始
+    startPalace = 7
+  }
+  
+  // 九宫顺序（顺时针）：从起始宫位开始
+  // 0=巽, 1=离, 2=坤, 3=震, 4=中, 5=兑, 6=乾, 7=坎, 8=艮
+  // 顺时针顺序：7(坎) -> 8(艮) -> 0(巽) -> 1(离) -> 2(坤) -> 3(震) -> 5(兑) -> 6(乾) -> 7(坎)
+  const clockwiseOrder = [7, 8, 0, 1, 2, 3, 5, 6] // 跳过中宫(4)
+  
+  // 找到起始宫位在顺时针顺序中的位置
+  let startIdx = clockwiseOrder.indexOf(startPalace)
+  if (startIdx === -1) {
+    startIdx = 0 // 默认从坎宫开始
+  }
+  
+  // 从值符开始排列八神
+  let shenIdx = 0 // 从值符开始
+  for (let i = 0; i < 8; i++) {
+    const palaceIdx = clockwiseOrder[(startIdx + i) % 8]
+    if (palaceIdx === 4) continue // 跳过中宫（已处理）
     
-    positions[i] = bashen[shenIdx]
+    // 如果这个宫位已经有值符，跳过（值符已经在前面放置了）
+    if (positions[palaceIdx] === bashen[0]) {
+      shenIdx = (shenIdx + 1) % 8
+      continue
+    }
+    
+    positions[palaceIdx] = bashen[shenIdx]
     shenIdx = (shenIdx + 1) % 8
-    if (shenIdx === 0) shenIdx = 1 // 跳过值符
   }
   
   return positions
@@ -427,18 +455,13 @@ function calculateQimenPan(
   const dayPillar = calculateDayPillar(date)
   const hourPillar = calculateHourPillar(dayPillar, hour)
   
-  let shiGanZhi: string
+  // 使用完整的时干支计算算法（五鼠遁）
   if (!hourPillar) {
-    // 如果计算失败，使用简化方法
-    const hourIndex = Math.floor((hour + 1) / 2) % 12
-    const shiZhi = dizhi[hourIndex]
-    const dayGanIndex = tiangan.indexOf(dayPillar[0])
-    const shiGanIndex = (dayGanIndex * 2 + hourIndex) % 10
-    const shiGan = tiangan[shiGanIndex]
-    shiGanZhi = shiGan + shiZhi
-  } else {
-    shiGanZhi = hourPillar
+    // 如果计算失败，抛出错误（不应该发生）
+    throw new Error(`无法计算时干支：hour=${hour}`)
   }
+  
+  const shiGanZhi = hourPillar
   
   const shiGan = shiGanZhi[0]
   const shiZhi = shiGanZhi[1]
@@ -453,11 +476,20 @@ function calculateQimenPan(
   // 排九星
   const jiuxingPositions = placeJiuxing(yongJu, zhiFu, shiZhi)
   
+  // 找到值符星所在宫位（用于排八神）
+  let zhiFuStarPalace = 4 // 默认中宫
+  for (let i = 0; i < 9; i++) {
+    if (jiuxingPositions[i] === jiuxing[zhiFu]) {
+      zhiFuStarPalace = i
+      break
+    }
+  }
+  
   // 排八门
   const bamenPositions = placeBamen(zhiShi, shiZhi)
   
-  // 排八神
-  const bashenPositions = placeBashen(zhiFu)
+  // 排八神（根据值符星所在宫位）
+  const bashenPositions = placeBashen(zhiFuStarPalace)
   
   // 生成九宫格数据
   const palaces = palacePositions.map((pos, index) => {
