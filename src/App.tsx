@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, Suspense, lazy } from 'react'
 import { Analytics } from '@vercel/analytics/react'
 import { tarotCards, TarotCard } from './data/tarotCards'
 import CardDisplay from './components/CardDisplay'
@@ -12,21 +12,22 @@ import Favorites from './components/Favorites'
 import CardDrawAnimation from './components/CardDrawAnimation'
 import ThreeCardDrawAnimation from './components/ThreeCardDrawAnimation'
 import ReadingTypeSelector from './components/ReadingTypeSelector'
-import NameGenerator from './components/NameGenerator'
-import Horoscope from './components/Horoscope'
-import Almanac from './components/Almanac'
-import CyberMerit from './components/CyberMerit'
-import BaziFortune from './components/BaziFortune'
-import DivinationDraw from './components/DivinationDraw'
-import DreamInterpretation from './components/DreamInterpretation'
-import FengshuiCompass from './components/FengshuiCompass'
-import AuspiciousDate from './components/AuspiciousDate'
-import NumberEnergy from './components/NumberEnergy'
-import LuckyColor from './components/LuckyColor'
-import QimenDunjia from './components/QimenDunjia'
-import NameTest from './components/NameTest'
-import ZiweiDoushu from './components/ZiweiDoushu'
-import ShengxiaoPairing from './components/ShengxiaoPairing'
+// 动态导入大型功能组件
+const NameGenerator = lazy(() => import('./components/NameGenerator'))
+const Horoscope = lazy(() => import('./components/Horoscope'))
+const Almanac = lazy(() => import('./components/Almanac'))
+const CyberMerit = lazy(() => import('./components/CyberMerit'))
+const BaziFortune = lazy(() => import('./components/BaziFortune'))
+const DivinationDraw = lazy(() => import('./components/DivinationDraw'))
+const DreamInterpretation = lazy(() => import('./components/DreamInterpretation'))
+const FengshuiCompass = lazy(() => import('./components/FengshuiCompass'))
+const AuspiciousDate = lazy(() => import('./components/AuspiciousDate'))
+const NumberEnergy = lazy(() => import('./components/NumberEnergy'))
+const LuckyColor = lazy(() => import('./components/LuckyColor'))
+const QimenDunjia = lazy(() => import('./components/QimenDunjia'))
+const NameTest = lazy(() => import('./components/NameTest'))
+const ZiweiDoushu = lazy(() => import('./components/ZiweiDoushu'))
+const ShengxiaoPairing = lazy(() => import('./components/ShengxiaoPairing'))
 import { getCardIcon, getSuitIcon } from './utils/cardIcons'
 import { generateThreeCardReading } from './utils/readingInterpretation'
 import { downloadReading } from './utils/exportReading'
@@ -599,37 +600,38 @@ function App() {
       </header>
 
       <main className="app-main">
-        {currentPage === 'name' ? (
-          <NameGenerator onBack={() => setCurrentPage('tarot')} />
-        ) : currentPage === 'horoscope' ? (
-          <Horoscope onBack={() => setCurrentPage('tarot')} />
-        ) : currentPage === 'almanac' ? (
-          <Almanac onBack={() => setCurrentPage('tarot')} />
-        ) : currentPage === 'cybermerit' ? (
-          <CyberMerit onBack={() => setCurrentPage('tarot')} />
-        ) : currentPage === 'bazi' ? (
-          <BaziFortune onBack={() => setCurrentPage('tarot')} />
-        ) : currentPage === 'divination' ? (
-          <DivinationDraw onBack={() => setCurrentPage('tarot')} />
-        ) : currentPage === 'dream' ? (
-          <DreamInterpretation onBack={() => setCurrentPage('tarot')} />
-        ) : currentPage === 'fengshui' ? (
-          <FengshuiCompass onBack={() => setCurrentPage('tarot')} />
-        ) : currentPage === 'auspicious' ? (
-          <AuspiciousDate onBack={() => setCurrentPage('tarot')} />
-        ) : currentPage === 'numberenergy' ? (
-          <NumberEnergy onBack={() => setCurrentPage('tarot')} />
-        ) : currentPage === 'luckycolor' ? (
-          <LuckyColor onBack={() => setCurrentPage('tarot')} />
-        ) : currentPage === 'qimen' ? (
-          <QimenDunjia onBack={() => setCurrentPage('tarot')} />
-        ) : currentPage === 'nametest' ? (
-          <NameTest onBack={() => setCurrentPage('tarot')} />
-        ) : currentPage === 'ziwei' ? (
-          <ZiweiDoushu onBack={() => setCurrentPage('tarot')} />
-        ) : currentPage === 'shengxiao' ? (
-          <ShengxiaoPairing onBack={() => setCurrentPage('tarot')} />
-        ) : (
+        <Suspense fallback={<div className="loading-fallback">加载中...</div>}>
+          {currentPage === 'name' ? (
+            <NameGenerator onBack={() => setCurrentPage('tarot')} />
+          ) : currentPage === 'horoscope' ? (
+            <Horoscope onBack={() => setCurrentPage('tarot')} />
+          ) : currentPage === 'almanac' ? (
+            <Almanac onBack={() => setCurrentPage('tarot')} />
+          ) : currentPage === 'cybermerit' ? (
+            <CyberMerit onBack={() => setCurrentPage('tarot')} />
+          ) : currentPage === 'bazi' ? (
+            <BaziFortune onBack={() => setCurrentPage('tarot')} />
+          ) : currentPage === 'divination' ? (
+            <DivinationDraw onBack={() => setCurrentPage('tarot')} />
+          ) : currentPage === 'dream' ? (
+            <DreamInterpretation onBack={() => setCurrentPage('tarot')} />
+          ) : currentPage === 'fengshui' ? (
+            <FengshuiCompass onBack={() => setCurrentPage('tarot')} />
+          ) : currentPage === 'auspicious' ? (
+            <AuspiciousDate onBack={() => setCurrentPage('tarot')} />
+          ) : currentPage === 'numberenergy' ? (
+            <NumberEnergy onBack={() => setCurrentPage('tarot')} />
+          ) : currentPage === 'luckycolor' ? (
+            <LuckyColor onBack={() => setCurrentPage('tarot')} />
+          ) : currentPage === 'qimen' ? (
+            <QimenDunjia onBack={() => setCurrentPage('tarot')} />
+          ) : currentPage === 'nametest' ? (
+            <NameTest onBack={() => setCurrentPage('tarot')} />
+          ) : currentPage === 'ziwei' ? (
+            <ZiweiDoushu onBack={() => setCurrentPage('tarot')} />
+          ) : currentPage === 'shengxiao' ? (
+            <ShengxiaoPairing onBack={() => setCurrentPage('tarot')} />
+          ) : (
           <>
         {/* 单张牌抽牌动画 */}
         {showDrawAnimation && drawingCard && (
@@ -815,7 +817,8 @@ function App() {
         {/* 统计信息 */}
         <Statistics readings={readingHistory} />
           </>
-        )}
+          )}
+        </Suspense>
       </main>
 
       <footer className="app-footer">
