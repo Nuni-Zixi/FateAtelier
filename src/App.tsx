@@ -12,7 +12,7 @@ import Favorites from './components/Favorites'
 import CardDrawAnimation from './components/CardDrawAnimation'
 import ThreeCardDrawAnimation from './components/ThreeCardDrawAnimation'
 import ReadingTypeSelector from './components/ReadingTypeSelector'
-import SnowEffect from './components/SnowEffect'
+import WeatherEffect, { WeatherType } from './components/WeatherEffect'
 // 动态导入大型功能组件
 const NameGenerator = lazy(() => import('./components/NameGenerator'))
 const Horoscope = lazy(() => import('./components/Horoscope'))
@@ -59,10 +59,13 @@ function App() {
   const [touchStart, setTouchStart] = useState(0)
   const [touchEnd, setTouchEnd] = useState(0)
   const [transitionEffect, setTransitionEffect] = useState<string>('')
-  const [snowEnabled, setSnowEnabled] = useState(() => {
-    // 根据月份自动启用（11月-2月）
+  const [weatherType, setWeatherType] = useState<WeatherType>(() => {
+    // 根据月份自动选择天气（11月-2月：雪花，3-5月：小雨，6-8月：太阳，9-10月：多云）
     const month = new Date().getMonth() + 1
-    return month === 11 || month === 12 || month === 1 || month === 2
+    if (month === 11 || month === 12 || month === 1 || month === 2) return 'snow'
+    if (month >= 3 && month <= 5) return 'rain'
+    if (month >= 6 && month <= 8) return 'sun'
+    return 'cloudy'
   })
 
   // 阻止手机端页面左右滑动
@@ -375,10 +378,48 @@ function App() {
     }
   }, [currentPage])
 
+  // 切换天气类型
+  const cycleWeather = () => {
+    const weathers: WeatherType[] = ['none', 'snow', 'rain', 'sun', 'cloudy']
+    const currentIndex = weathers.indexOf(weatherType)
+    const nextIndex = (currentIndex + 1) % weathers.length
+    setWeatherType(weathers[nextIndex])
+  }
+
+  const getWeatherIcon = () => {
+    switch (weatherType) {
+      case 'snow':
+        return '❄️'
+      case 'rain':
+        return '🌧️'
+      case 'sun':
+        return '☀️'
+      case 'cloudy':
+        return '☁️'
+      default:
+        return '🌨️'
+    }
+  }
+
+  const getWeatherTitle = () => {
+    switch (weatherType) {
+      case 'snow':
+        return '关闭雪花'
+      case 'rain':
+        return '关闭小雨'
+      case 'sun':
+        return '关闭阳光'
+      case 'cloudy':
+        return '关闭多云'
+      default:
+        return '切换天气'
+    }
+  }
+
   return (
     <div className="app">
-      {/* 雪花效果 */}
-      <SnowEffect enabled={snowEnabled} intensity="medium" />
+      {/* 天气效果 */}
+      <WeatherEffect weatherType={weatherType} intensity="medium" />
       
       <header className="app-header">
         <h1>🔮 命运工坊</h1>
@@ -605,11 +646,11 @@ function App() {
             <Favorites onSelectCard={handleSelectCardFromBrowser} />
             <HelpGuide />
             <button
-              className="snow-toggle-btn"
-              onClick={() => setSnowEnabled(!snowEnabled)}
-              title={snowEnabled ? '关闭雪花' : '开启雪花'}
+              className="weather-toggle-btn"
+              onClick={cycleWeather}
+              title={getWeatherTitle()}
             >
-              {snowEnabled ? '❄️' : '🌨️'}
+              {getWeatherIcon()}
             </button>
           </div>
         )}

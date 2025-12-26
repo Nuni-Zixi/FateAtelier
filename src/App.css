@@ -1317,8 +1317,8 @@
   }
 }
 
-/* 雪花开关按钮 */
-.snow-toggle-btn {
+/* 天气切换按钮 */
+.weather-toggle-btn {
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 50%;
@@ -1338,14 +1338,14 @@
   vertical-align: middle;
 }
 
-.snow-toggle-btn:hover {
+.weather-toggle-btn:hover {
   background: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.4);
-  transform: scale(1.1);
+  transform: scale(1.1) rotate(15deg);
   box-shadow: 0 0 15px rgba(135, 206, 250, 0.5);
 }
 
-.snow-toggle-btn:active {
-  transform: scale(0.95);
+.weather-toggle-btn:active {
+  transform: scale(0.95) rotate(-15deg);
 }
 
