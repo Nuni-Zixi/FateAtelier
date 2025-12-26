@@ -266,36 +266,6 @@ function placeJiuxing(yongJu: number, zhiFu: number, shiZhi: string): string[] {
     result[shiGanPalace] = jiuxing[zhiFu]
   }
   
-  // 根据用局确定九星的初始排列
-  // 用局对应的初始宫位（传统九宫编号）
-  let startTraditionalPalace = 0
-  if (isYangDun) {
-    startTraditionalPalace = yongJu // 阳遁：用局数就是起始宫位
-  } else {
-    startTraditionalPalace = 10 - yongJu // 阴遁：10-用局数
-  }
-  const startPalace = traditionalToCode[startTraditionalPalace]
-  
-  // 计算从起始宫位到时干宫位的偏移（用于确定值符星在初始局中的位置）
-  let offset = 0
-  if (isYangDun) {
-    // 阳遁顺排
-    if (shiGanPalace >= startPalace) {
-      offset = shiGanPalace - startPalace
-    } else {
-      offset = (9 - startPalace) + shiGanPalace
-      if (offset >= 9) offset -= 9
-    }
-  } else {
-    // 阴遁逆排
-    if (shiGanPalace <= startPalace) {
-      offset = startPalace - shiGanPalace
-    } else {
-      offset = startPalace + (9 - shiGanPalace)
-      if (offset >= 9) offset -= 9
-    }
-  }
-  
   // 从值符星开始，按照阳遁/阴遁规则排列其他星
   // 九星顺序：天蓬(0), 天芮(1), 天冲(2), 天辅(3), 天禽(4), 天心(5), 天柱(6), 天任(7), 天英(8)
   let starIdx = 0
