@@ -131,6 +131,12 @@
   perspective: 1000px;
   touch-action: pan-y; /* 只允许垂直滚动，阻止水平滑动 */
   -webkit-overflow-scrolling: touch;
+  cursor: grab;
+  user-select: none;
+}
+
+.carousel-container:active {
+  cursor: grabbing;
 }
 
 .carousel-wrapper {
@@ -140,6 +146,12 @@
   perspective: 1000px;
   transform-style: preserve-3d;
   overflow: visible;
+  transition: transform 0.3s ease-out;
+}
+
+.carousel-container:active .carousel-wrapper {
+  cursor: grabbing;
+  transition: none; /* 拖拽时禁用过渡，让实时反馈更流畅 */
 }
 
 /* 切换特效层 */

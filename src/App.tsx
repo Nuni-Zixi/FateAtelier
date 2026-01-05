@@ -507,65 +507,111 @@ function App() {
           }}
           onMouseDown={(e) => {
             e.preventDefault()
-            setTouchStart(e.clientX)
-          }}
-          onMouseMove={(e) => {
-            if (touchStart) {
-              setTouchEnd(e.clientX)
+            const startX = e.clientX
+            const startRotation = carouselRotation
+            const currentIndex = carouselIndex
+            let isDraggingActive = true
+            let lastX = startX
+            
+            setTouchStart(startX)
+            
+            // 禁用过渡效果，让拖拽更流畅
+            const carouselTrack = document.querySelector('.carousel-track')
+            if (carouselTrack) {
+              carouselTrack.classList.add('no-transition')
             }
-          }}
-          onMouseUp={() => {
-            if (!touchStart || !touchEnd) {
+            
+            // 添加全局事件监听器，确保即使鼠标移出元素也能继续跟踪
+            const handleMouseMove = (moveEvent: MouseEvent) => {
+              if (!isDraggingActive) return
+              const currentX = moveEvent.clientX
+              const deltaX = currentX - startX
+              lastX = currentX
+              
+              setTouchEnd(currentX)
+              
+              // 实时更新旋转角度（跟随鼠标）
+              const features = getFilteredFeatures()
+              const totalFeatures = features.length
+              const anglePerItem = 360 / totalFeatures
+              const sensitivity = 0.4 // 降低灵敏度，让拖拽更平滑
+              const rotationDelta = (deltaX / 100) * anglePerItem * sensitivity
+              let newRotation = startRotation - rotationDelta
+              
+              // 归一化角度
+              while (newRotation < -180) newRotation += 360
+              while (newRotation > 180) newRotation -= 360
+              
+              setCarouselRotation(newRotation)
+            }
+            
+            const handleMouseUp = () => {
+              isDraggingActive = false
+              
+              // 恢复过渡效果
+              const carouselTrack = document.querySelector('.carousel-track')
+              if (carouselTrack) {
+                // 使用 setTimeout 确保在下一帧移除类，让过渡效果生效
+                setTimeout(() => {
+                  carouselTrack.classList.remove('no-transition')
+                }, 0)
+              }
+              
+              const finalDistance = startX - lastX
+              const minSwipeDistance = 30 // 降低阈值，让体验更流畅
+              const features = getFilteredFeatures()
+              const totalFeatures = features.length
+              const anglePerItem = 360 / totalFeatures
+
+              if (Math.abs(finalDistance) > minSwipeDistance) {
+                // 随机选择一个切换效果
+                const randomEffect = CAROUSEL_EFFECTS[Math.floor(Math.random() * CAROUSEL_EFFECTS.length)]
+                setTransitionEffect(randomEffect)
+                
+                // 0.6秒后清除效果（与transition时间一致）
+                setTimeout(() => setTransitionEffect(''), 600)
+                
+                if (finalDistance > 0) {
+                  // 向左滑动，显示下一个（循环）
+                  const newIndex = (currentIndex + 1) % totalFeatures
+                  let targetRotation = startRotation - anglePerItem
+                  
+                  // 归一化角度到 -180 到 180 度之间，让CSS走最短路径
+                  while (targetRotation < -180) targetRotation += 360
+                  while (targetRotation > 180) targetRotation -= 360
+                  
+                  setCarouselRotation(targetRotation)
+                  setCarouselIndex(newIndex)
+                  setCurrentPage(features[newIndex].page)
+                } else if (finalDistance < 0) {
+                  // 向右滑动，显示上一个（循环）
+                  const newIndex = (currentIndex - 1 + totalFeatures) % totalFeatures
+                  let targetRotation = startRotation + anglePerItem
+                  
+                  // 归一化角度到 -180 到 180 度之间，让CSS走最短路径
+                  while (targetRotation < -180) targetRotation += 360
+                  while (targetRotation > 180) targetRotation -= 360
+                  
+                  setCarouselRotation(targetRotation)
+                  setCarouselIndex(newIndex)
+                  setCurrentPage(features[newIndex].page)
+                }
+              } else {
+                // 如果拖拽距离不够，回弹到原始位置
+                setCarouselRotation(startRotation)
+              }
+              
               setTouchStart(0)
               setTouchEnd(0)
-              return
-            }
-            const distance = touchStart - touchEnd
-            const minSwipeDistance = 50
-            const features = getFilteredFeatures()
-            const totalFeatures = features.length
-            const anglePerItem = 360 / totalFeatures
-
-            if (Math.abs(distance) > minSwipeDistance) {
-              // 随机选择一个切换效果
-              const randomEffect = CAROUSEL_EFFECTS[Math.floor(Math.random() * CAROUSEL_EFFECTS.length)]
-              setTransitionEffect(randomEffect)
               
-              // 0.6秒后清除效果（与transition时间一致）
-              setTimeout(() => setTransitionEffect(''), 600)
-              
-              if (distance > 0) {
-                // 向左滑动，显示下一个（循环）
-                const newIndex = (carouselIndex + 1) % totalFeatures
-                let targetRotation = carouselRotation - anglePerItem
-                
-                // 归一化角度到 -180 到 180 度之间，让CSS走最短路径
-                while (targetRotation < -180) targetRotation += 360
-                while (targetRotation > 180) targetRotation -= 360
-                
-                setCarouselRotation(targetRotation)
-                setCarouselIndex(newIndex)
-                setCurrentPage(features[newIndex].page)
-              } else if (distance < 0) {
-                // 向右滑动，显示上一个（循环）
-                const newIndex = (carouselIndex - 1 + totalFeatures) % totalFeatures
-                let targetRotation = carouselRotation + anglePerItem
-                
-                // 归一化角度到 -180 到 180 度之间，让CSS走最短路径
-                while (targetRotation < -180) targetRotation += 360
-                while (targetRotation > 180) targetRotation -= 360
-                
-                setCarouselRotation(targetRotation)
-                setCarouselIndex(newIndex)
-                setCurrentPage(features[newIndex].page)
-              }
+              // 移除全局事件监听器
+              document.removeEventListener('mousemove', handleMouseMove)
+              document.removeEventListener('mouseup', handleMouseUp)
             }
-            setTouchStart(0)
-            setTouchEnd(0)
-          }}
-          onMouseLeave={() => {
-            setTouchStart(0)
-            setTouchEnd(0)
+            
+            // 添加全局事件监听器
+            document.addEventListener('mousemove', handleMouseMove)
+            document.addEventListener('mouseup', handleMouseUp)
           }}
         >
           <div className="carousel-wrapper">
