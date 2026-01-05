@@ -331,8 +331,8 @@ function App() {
     await shareReading(reading)
   }
 
-  // 获取所有功能列表
-  const getFilteredFeatures = () => {
+  // 获取所有功能列表 - 使用 useMemo 缓存，避免每次渲染都重新创建
+  const features = useMemo(() => {
     return [
       { page: 'tarot' as const, icon: '🔮', name: '塔罗占卜' },
       { page: 'name' as const, icon: '✨', name: '智能取名' },
@@ -351,11 +351,10 @@ function App() {
       { page: 'ziwei' as const, icon: '⭐', name: '紫微斗数' },
       { page: 'shengxiao' as const, icon: '🐲', name: '生肖配对' },
     ]
-  }
+  }, [])
 
   // 当页面改变时，更新轮播索引和旋转角度
   useEffect(() => {
-    const features = getFilteredFeatures()
     const currentIndex = features.findIndex(f => f.page === currentPage)
     if (currentIndex >= 0) {
       const anglePerItem = 360 / features.length
@@ -376,7 +375,7 @@ function App() {
       setCarouselIndex(currentIndex)
       setCarouselRotation(normalizedRotation)
     }
-  }, [currentPage])
+  }, [currentPage, features, carouselRotation])
 
   // 切换天气类型
   const cycleWeather = () => {
@@ -386,7 +385,8 @@ function App() {
     setWeatherType(weathers[nextIndex])
   }
 
-  const getWeatherIcon = () => {
+  // 使用 useMemo 缓存天气图标和标题，避免每次渲染都重新计算
+  const weatherIcon = useMemo(() => {
     switch (weatherType) {
       case 'snow':
         return '❄️'
@@ -399,9 +399,9 @@ function App() {
       default:
         return '🌨️'
     }
-  }
+  }, [weatherType])
 
-  const getWeatherTitle = () => {
+  const weatherTitle = useMemo(() => {
     switch (weatherType) {
       case 'snow':
         return '关闭雪花'
@@ -414,7 +414,7 @@ function App() {
       default:
         return '切换天气'
     }
-  }
+  }, [weatherType])
 
   return (
     <div className="app">
@@ -464,7 +464,6 @@ function App() {
             }
             const distance = touchStart - touchEnd
             const minSwipeDistance = 50
-            const features = getFilteredFeatures()
             const totalFeatures = features.length
             const anglePerItem = 360 / totalFeatures
 
@@ -531,7 +530,6 @@ function App() {
               setTouchEnd(currentX)
               
               // 实时更新旋转角度（跟随鼠标）
-              const features = getFilteredFeatures()
               const totalFeatures = features.length
               const anglePerItem = 360 / totalFeatures
               const sensitivity = 0.4 // 降低灵敏度，让拖拽更平滑
@@ -559,7 +557,6 @@ function App() {
               
               const finalDistance = startX - lastX
               const minSwipeDistance = 30 // 降低阈值，让体验更流畅
-              const features = getFilteredFeatures()
               const totalFeatures = features.length
               const anglePerItem = 360 / totalFeatures
 
@@ -648,9 +645,9 @@ function App() {
                 '--carousel-rotation': `${carouselRotation}deg`,
               } as React.CSSProperties}
             >
-              {getFilteredFeatures().map((feature, index) => {
+              {features.map((feature, index) => {
                 const isCenter = index === carouselIndex
-                const angle = (360 / Math.max(1, getFilteredFeatures().length)) * index
+                const angle = (360 / Math.max(1, features.length)) * index
                 // 中间卡片更靠前，避免穿透
                 const translateZ = isCenter ? 450 : 400
                 return (
@@ -661,7 +658,6 @@ function App() {
                       transform: `rotateY(${angle}deg) translateZ(${translateZ}px)`
                     }}
                     onClick={() => {
-                      const features = getFilteredFeatures()
                       const anglePerItem = 360 / features.length
                       
                       // 如果点击的不是当前项，触发切换效果
@@ -694,9 +690,9 @@ function App() {
             <button
               className="weather-toggle-btn"
               onClick={cycleWeather}
-              title={getWeatherTitle()}
+              title={weatherTitle}
             >
-              {getWeatherIcon()}
+              {weatherIcon}
             </button>
           </div>
         )}
