@@ -38,7 +38,7 @@ import { DrawnCard } from './types'
 import { ReadingType } from './types/reading'
 import './App.css'
 
-const CAROUSEL_EFFECTS = ['mystic', 'sparkle', 'glow', 'fade', 'swirl', 'zoom', 'flip', 'warp'] as const
+// const CAROUSEL_EFFECTS = ['mystic', 'sparkle', 'glow', 'fade', 'swirl', 'zoom', 'flip', 'warp'] as const
 
 function App() {
   const [drawnCards, setDrawnCards] = useState<DrawnCard[]>([])
@@ -58,7 +58,7 @@ function App() {
   const [carouselRotation, setCarouselRotation] = useState(0)
   const [touchStart, setTouchStart] = useState(0)
   const [touchEnd, setTouchEnd] = useState(0)
-  const [transitionEffect, setTransitionEffect] = useState<string>('')
+  // const [transitionEffect, setTransitionEffect] = useState<string>('')
   // const [weatherType, setWeatherType] = useState<WeatherType>(() => {
   //   // 根据月份自动选择天气（11月-2月：雪花，3-5月：小雨，6-8月：太阳，9-10月：多云）
   //   const month = new Date().getMonth() + 1
@@ -469,11 +469,11 @@ function App() {
 
             if (Math.abs(distance) > minSwipeDistance) {
               // 随机选择一个切换效果
-              const randomEffect = CAROUSEL_EFFECTS[Math.floor(Math.random() * CAROUSEL_EFFECTS.length)]
-              setTransitionEffect(randomEffect)
+              // const randomEffect = CAROUSEL_EFFECTS[Math.floor(Math.random() * CAROUSEL_EFFECTS.length)]
+              // setTransitionEffect(randomEffect)
               
               // 0.6秒后清除效果（与transition时间一致）
-              setTimeout(() => setTransitionEffect(''), 600)
+              // setTimeout(() => setTransitionEffect(''), 600)
               
               if (distance > 0) {
                 // 向左滑动，显示下一个（循环）
@@ -562,11 +562,11 @@ function App() {
 
               if (Math.abs(finalDistance) > minSwipeDistance) {
                 // 随机选择一个切换效果
-                const randomEffect = CAROUSEL_EFFECTS[Math.floor(Math.random() * CAROUSEL_EFFECTS.length)]
-                setTransitionEffect(randomEffect)
+                // const randomEffect = CAROUSEL_EFFECTS[Math.floor(Math.random() * CAROUSEL_EFFECTS.length)]
+                // setTransitionEffect(randomEffect)
                 
                 // 0.6秒后清除效果（与transition时间一致）
-                setTimeout(() => setTransitionEffect(''), 600)
+                // setTimeout(() => setTransitionEffect(''), 600)
                 
                 if (finalDistance > 0) {
                   // 向左滑动，显示下一个（循环）
@@ -613,7 +613,7 @@ function App() {
         >
           <div className="carousel-wrapper">
             {/* 切换特效层 */}
-            {transitionEffect && (
+            {/* {transitionEffect && (
               <div className={`transition-effect ${transitionEffect}`}>
                 <div className="effect-particles">
                   {[...Array(20)].map((_, i) => {
@@ -637,9 +637,9 @@ function App() {
                 </div>
                 <div className="effect-light" />
               </div>
-            )}
+            )} */}
             <div 
-              className={`carousel-track ${transitionEffect ? `effect-${transitionEffect}` : ''}`}
+              className="carousel-track"
               style={{
                 transform: `translateZ(-400px) rotateY(${carouselRotation}deg)`,
                 '--carousel-rotation': `${carouselRotation}deg`,
@@ -661,11 +661,11 @@ function App() {
                       const anglePerItem = 360 / features.length
                       
                       // 如果点击的不是当前项，触发切换效果
-                      if (index !== carouselIndex) {
-                        const randomEffect = CAROUSEL_EFFECTS[Math.floor(Math.random() * CAROUSEL_EFFECTS.length)]
-                        setTransitionEffect(randomEffect)
-                        setTimeout(() => setTransitionEffect(''), 600)
-                      }
+                      // if (index !== carouselIndex) {
+                      //   const randomEffect = CAROUSEL_EFFECTS[Math.floor(Math.random() * CAROUSEL_EFFECTS.length)]
+                      //   setTransitionEffect(randomEffect)
+                      //   setTimeout(() => setTransitionEffect(''), 600)
+                      // }
                       
                       setCarouselRotation(-index * anglePerItem)
                       setCarouselIndex(index)
