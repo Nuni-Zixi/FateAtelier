@@ -159,7 +159,7 @@ function CyberMerit({ onBack: _onBack }: CyberMeritProps) {
   // 播放音效（使用Web Audio API生成简单音效）
   const playSound = (frequency: number, duration: number = 100, type: 'woodfish' | 'release' | 'incense' | 'prayer' = 'woodfish') => {
     try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)()
       
       if (type === 'woodfish') {
         // 木鱼声音：使用多个频率叠加，模拟木鱼的共鸣效果

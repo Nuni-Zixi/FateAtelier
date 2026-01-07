@@ -13,6 +13,7 @@ import CardDrawAnimation from './components/CardDrawAnimation'
 import ThreeCardDrawAnimation from './components/ThreeCardDrawAnimation'
 import ReadingTypeSelector from './components/ReadingTypeSelector'
 import ToastContainer from './components/ToastContainer'
+import ConfirmDialogContainer from './components/ConfirmDialogContainer'
 // import WeatherEffect, { WeatherType } from './components/WeatherEffect'
 // 动态导入大型功能组件
 const NameGenerator = lazy(() => import('./components/NameGenerator'))
@@ -38,6 +39,7 @@ import { downloadAllData } from './utils/exportData'
 import { DrawnCard } from './types'
 import { ReadingType } from './types/reading'
 import { toast } from './utils/toast'
+import { confirm } from './utils/confirm'
 import { getStorageItem, setStorageItem } from './utils/storage'
 import './App.css'
 
@@ -137,11 +139,10 @@ function App() {
 
   // 保存历史记录到localStorage
   useEffect(() => {
-    if (readingHistory.length > 0) {
-      const result = setStorageItem('tarot-reading-history', readingHistory)
-      if (!result.success && result.error) {
-        toast.warning(result.error || '保存历史记录失败')
-      }
+    // 始终保存，包括空数组（用于删除所有记录的情况）
+    const result = setStorageItem('tarot-reading-history', readingHistory)
+    if (!result.success && result.error) {
+      toast.warning(result.error || '保存历史记录失败')
     }
   }, [readingHistory])
 
@@ -326,8 +327,15 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
 
-  const handleDeleteHistoryReading = useCallback((id: string) => {
-    if (confirm('确定要删除这条占卜记录吗？')) {
+  const handleDeleteHistoryReading = useCallback(async (id: string) => {
+    const confirmed = await confirm({
+      title: '删除占卜记录',
+      message: '确定要删除这条占卜记录吗？',
+      confirmText: '删除',
+      cancelText: '取消',
+      type: 'danger'
+    })
+    if (confirmed) {
       setReadingHistory(prev => prev.filter(r => r.id !== id))
     }
   }, [])
@@ -685,9 +693,21 @@ function App() {
                       setCarouselIndex(index)
                       setCurrentPage(feature.page)
                     }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        const anglePerItem = 360 / features.length
+                        setCarouselRotation(-index * anglePerItem)
+                        setCarouselIndex(index)
+                        setCurrentPage(feature.page)
+                      }
+                    }}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`选择${feature.name}功能`}
                   >
                     <div className="feature-card">
-                      <div className="feature-icon">{feature.icon}</div>
+                      <div className="feature-icon" aria-hidden="true">{feature.icon}</div>
                       <div className="feature-name">{feature.name}</div>
                     </div>
                   </div>
@@ -953,6 +973,7 @@ function App() {
         </div>
       </footer>
       <ToastContainer />
+      <ConfirmDialogContainer />
       <Analytics />
     </div>
   )

@@ -4,6 +4,7 @@ import { optimizeStick } from '../utils/divinationOptimizer'
 import './DivinationDraw.css'
 import { getStorageItem, setStorageItem } from '../utils/storage'
 import { toast } from '../utils/toast'
+import { confirm } from '../utils/confirm'
 
 interface DivinationDrawProps {
   onBack?: () => void
@@ -47,21 +48,19 @@ function DivinationDraw({ onBack }: DivinationDrawProps) {
 
   // 保存历史记录到localStorage
   useEffect(() => {
-    if (drawHistory.length > 0) {
-      const result = setStorageItem('divination-draw-history', drawHistory)
-      if (!result.success && result.error) {
-        toast.warning(result.error || '保存历史记录失败')
-      }
+    // 始终保存，包括空数组（用于删除所有记录的情况）
+    const result = setStorageItem('divination-draw-history', drawHistory)
+    if (!result.success && result.error) {
+      toast.warning(result.error || '保存历史记录失败')
     }
   }, [drawHistory])
 
   // 保存收藏到localStorage
   useEffect(() => {
-    if (favorites.size > 0) {
-      const result = setStorageItem('divination-favorites', Array.from(favorites))
-      if (!result.success && result.error) {
-        toast.warning(result.error || '保存收藏失败')
-      }
+    // 始终保存，包括空集合（用于清空收藏的情况）
+    const result = setStorageItem('divination-favorites', Array.from(favorites))
+    if (!result.success && result.error) {
+      toast.warning(result.error || '保存收藏失败')
     }
   }, [favorites])
 
@@ -204,10 +203,17 @@ ${optimizedStick.advice}${optimizedStick.story ? `\n\n戏文简介：\n${optimiz
   }
 
   // 清空历史记录
-  const clearHistory = () => {
-    if (window.confirm('确定要清空所有历史记录吗？此操作不可恢复。')) {
+  const clearHistory = async () => {
+    const confirmed = await confirm({
+      title: '清空历史记录',
+      message: '确定要清空所有历史记录吗？此操作不可恢复。',
+      confirmText: '清空',
+      cancelText: '取消',
+      type: 'danger'
+    })
+    if (confirmed) {
       setDrawHistory([])
-      localStorage.removeItem('divination-draw-history')
+      setStorageItem('divination-draw-history', [])
     }
   }
 

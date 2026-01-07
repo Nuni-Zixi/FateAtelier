@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { interpretDream, DreamSymbol } from '../data/dreamSymbols'
 import './DreamInterpretation.css'
 import { toast } from '../utils/toast'
+import { confirm } from '../utils/confirm'
 import { getStorageItem, setStorageItem } from '../utils/storage'
 
 interface DreamInterpretationProps {
@@ -42,11 +43,10 @@ function DreamInterpretation({ onBack }: DreamInterpretationProps) {
 
   // 保存历史记录到localStorage
   useEffect(() => {
-    if (history.length > 0) {
-      const result = setStorageItem('dream-interpretation-history', history)
-      if (!result.success && result.error) {
-        toast.warning(result.error || '保存历史记录失败')
-      }
+    // 始终保存，包括空数组（用于删除所有记录的情况）
+    const result = setStorageItem('dream-interpretation-history', history)
+    if (!result.success && result.error) {
+      toast.warning(result.error || '保存历史记录失败')
     }
   }, [history])
 
@@ -100,8 +100,15 @@ function DreamInterpretation({ onBack }: DreamInterpretationProps) {
     }, 100)
   }
 
-  const handleDeleteHistory = (id: string) => {
-    if (confirm('确定要删除这条记录吗？')) {
+  const handleDeleteHistory = async (id: string) => {
+    const confirmed = await confirm({
+      title: '删除记录',
+      message: '确定要删除这条记录吗？',
+      confirmText: '删除',
+      cancelText: '取消',
+      type: 'danger'
+    })
+    if (confirmed) {
       setHistory(history.filter(r => r.id !== id))
     }
   }

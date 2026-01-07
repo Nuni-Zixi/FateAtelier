@@ -54,7 +54,13 @@ function CardBrowser({ onSelectCard }: CardBrowserProps) {
     <div className="card-browser">
       <div className="browser-header">
         <h2>📚 牌面浏览</h2>
-        <button className="close-browser" onClick={() => setShowBrowser(false)}>✕</button>
+        <button 
+          className="close-browser" 
+          onClick={() => setShowBrowser(false)}
+          aria-label="关闭牌面浏览"
+        >
+          ✕
+        </button>
       </div>
 
       <div className="browser-controls">
@@ -72,36 +78,54 @@ function CardBrowser({ onSelectCard }: CardBrowserProps) {
           <button 
             className={filterType === 'all' ? 'filter-btn active' : 'filter-btn'}
             onClick={() => setFilterType('all')}
+            role="tab"
+            aria-selected={filterType === 'all'}
+            aria-label="显示全部牌面"
           >
             全部
           </button>
           <button 
             className={filterType === 'major' ? 'filter-btn active' : 'filter-btn'}
             onClick={() => setFilterType('major')}
+            role="tab"
+            aria-selected={filterType === 'major'}
+            aria-label="显示大阿卡纳"
           >
             大阿卡纳
           </button>
           <button 
             className={filterType === 'wands' ? 'filter-btn active' : 'filter-btn'}
             onClick={() => setFilterType('wands')}
+            role="tab"
+            aria-selected={filterType === 'wands'}
+            aria-label="显示权杖牌"
           >
             权杖
           </button>
           <button 
             className={filterType === 'cups' ? 'filter-btn active' : 'filter-btn'}
             onClick={() => setFilterType('cups')}
+            role="tab"
+            aria-selected={filterType === 'cups'}
+            aria-label="显示圣杯牌"
           >
             圣杯
           </button>
           <button 
             className={filterType === 'swords' ? 'filter-btn active' : 'filter-btn'}
             onClick={() => setFilterType('swords')}
+            role="tab"
+            aria-selected={filterType === 'swords'}
+            aria-label="显示宝剑牌"
           >
             宝剑
           </button>
           <button 
             className={filterType === 'pentacles' ? 'filter-btn active' : 'filter-btn'}
             onClick={() => setFilterType('pentacles')}
+            role="tab"
+            aria-selected={filterType === 'pentacles'}
+            aria-label="显示星币牌"
           >
             星币
           </button>

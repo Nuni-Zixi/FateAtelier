@@ -775,7 +775,7 @@ function Horoscope({ onBack: _onBack }: HoroscopeProps) {
                   const result = analyzeZodiacPairing(pairingSign1, pairingSign2)
                   setPairingResult(result)
                 } else {
-                  alert('请选择两个星座')
+                  toast.warning('请选择两个星座')
                 }
               }}
             >
