@@ -660,7 +660,14 @@ function BaziFortune({ onBack }: BaziFortuneProps) {
     bazi: string[]
     wuxing: { [key: string]: number }
     shishen: string[]
-    interpretation: any
+    interpretation: {
+      personality: string
+      career: string
+      wealth: string
+      health: string
+      relationship: string
+      summary: string
+    }
   } | null>(null)
 
   const shichenOptions = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']

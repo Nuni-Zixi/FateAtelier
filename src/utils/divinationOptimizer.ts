@@ -1,4 +1,5 @@
 // 签文解读优化工具 - 减少重复话术，生成更个性化的解读
+import type { DivinationStick } from '../data/divinationSticks'
 
 /**
  * 优化签文解读，去除重复话术，生成更个性化的内容
@@ -258,7 +259,7 @@ export function optimizeInterpretation(
 /**
  * 优化整个签文对象
  */
-export function optimizeStick(stick: any): any {
+export function optimizeStick(stick: DivinationStick): DivinationStick {
   // 保留所有原始字段，包括 story 和 dailyPoem
   const optimized = { 
     ...stick,
@@ -291,10 +292,11 @@ export function optimizeStick(stick: any): any {
   // 优化详细解读
   if (optimized.detailedInterpretations) {
     const detailed = { ...optimized.detailedInterpretations }
-    for (const key in detailed) {
+    const detailedKeys: Array<keyof typeof detailed> = Object.keys(detailed) as Array<keyof typeof detailed>
+    for (const key of detailedKeys) {
       if (detailed[key]) {
         detailed[key] = optimizeInterpretation(
-          detailed[key],
+          detailed[key] as string,
           optimized.title,
           optimized.level
         )
@@ -306,10 +308,11 @@ export function optimizeStick(stick: any): any {
   // 优化年龄性别解读
   if (optimized.ageGenderInterpretations) {
     const ageGender = { ...optimized.ageGenderInterpretations }
-    for (const key in ageGender) {
+    const ageGenderKeys: Array<keyof typeof ageGender> = Object.keys(ageGender) as Array<keyof typeof ageGender>
+    for (const key of ageGenderKeys) {
       if (ageGender[key]) {
         ageGender[key] = optimizeInterpretation(
-          ageGender[key],
+          ageGender[key] as string,
           optimized.title,
           optimized.level
         )
@@ -321,10 +324,11 @@ export function optimizeStick(stick: any): any {
   // 优化分类建议
   if (optimized.categories) {
     const categories = { ...optimized.categories }
-    for (const key in categories) {
+    const categoryKeys: Array<keyof typeof categories> = Object.keys(categories) as Array<keyof typeof categories>
+    for (const key of categoryKeys) {
       if (categories[key]) {
         categories[key] = optimizeInterpretation(
-          categories[key],
+          categories[key] as string,
           optimized.title,
           optimized.level
         )

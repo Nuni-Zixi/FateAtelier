@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, Suspense, lazy } from 'react'
+import { useState, useMemo, useEffect, useCallback, Suspense, lazy } from 'react'
 import { Analytics } from '@vercel/analytics/react'
 import { tarotCards, TarotCard } from './data/tarotCards'
 import CardDisplay from './components/CardDisplay'
@@ -156,7 +156,7 @@ function App() {
     return null
   }, [threeCardReading, selectedReadingType, customQuestion, viewingHistoryReading])
 
-  const drawCard = () => {
+  const drawCard = useCallback(() => {
     if (drawnCards.length >= 78) {
       toast.info('所有牌都已抽取完毕！')
       return
@@ -178,13 +178,12 @@ function App() {
     // 显示抽牌动画
     setDrawingCard({ card, isReversed: reversed })
     setShowDrawAnimation(true)
-  }
+  }, [drawnCards])
 
-  const handleDrawAnimationComplete = () => {
+  const handleDrawAnimationComplete = useCallback(() => {
     if (drawingCard) {
       const newDrawnCard: DrawnCard = { card: drawingCard.card, isReversed: drawingCard.isReversed }
-      const updatedDrawnCards = [...drawnCards, newDrawnCard]
-      setDrawnCards(updatedDrawnCards)
+      setDrawnCards((prev) => [...prev, newDrawnCard])
       setSelectedCard(newDrawnCard)
       setThreeCardReading(null) // 清除三牌占卜显示
 
@@ -195,23 +194,23 @@ function App() {
         cards: [newDrawnCard],
         timestamp: Date.now()
       }
-      setReadingHistory([historyRecord, ...readingHistory])
+      setReadingHistory((prev) => [historyRecord, ...prev])
       
       setDrawingCard(null)
       setShowDrawAnimation(false)
     }
-  }
+  }, [drawingCard])
 
-  const drawThreeCards = () => {
+  const drawThreeCards = useCallback(() => {
     if (drawnCards.length + 3 > 78) {
       toast.warning('剩余的牌不足以抽取三张！')
       return
     }
     // 先显示占卜类型选择器
     setShowReadingTypeSelector(true)
-  }
+  }, [drawnCards])
 
-  const handleReadingTypeSelected = (type: ReadingType, question?: string) => {
+  const handleReadingTypeSelected = useCallback((type: ReadingType, question?: string) => {
     setSelectedReadingType(type)
     setCustomQuestion(question)
     setShowReadingTypeSelector(false)
@@ -235,16 +234,16 @@ function App() {
     // 显示三张牌抽牌动画
     setDrawingThreeCards(threeDrawnCards)
     setShowThreeCardAnimation(true)
-  }
+  }, [drawnCards, selectedReadingType, customQuestion])
 
-  const handleThreeCardAnimationComplete = () => {
+  const handleThreeCardAnimationComplete = useCallback(() => {
     if (drawingThreeCards) {
       const threeDrawnCards: DrawnCard[] = drawingThreeCards.map(dc => ({
         card: dc.card,
         isReversed: dc.isReversed
       }))
 
-      setDrawnCards([...drawnCards, ...threeDrawnCards])
+      setDrawnCards((prev) => [...prev, ...threeDrawnCards])
       setThreeCardReading(threeDrawnCards) // 设置三牌占卜显示
       setSelectedCard(null) // 清除单张牌显示
 
@@ -259,14 +258,14 @@ function App() {
         readingType: selectedReadingType,
         customQuestion: customQuestion
       }
-      setReadingHistory([historyRecord, ...readingHistory])
+      setReadingHistory((prev) => [historyRecord, ...prev])
       
       setDrawingThreeCards(null)
       setShowThreeCardAnimation(false)
     }
-  }
+  }, [drawingThreeCards, selectedReadingType, customQuestion])
 
-  const reset = () => {
+  const reset = useCallback(() => {
     setDrawnCards([])
     setSelectedCard(null)
     setThreeCardReading(null)
@@ -274,34 +273,40 @@ function App() {
     setShowReadingTypeSelector(false)
     setSelectedReadingType('general')
     setCustomQuestion(undefined)
-  }
+  }, [])
 
-  const selectCard = (drawnCard: DrawnCard) => {
+  const selectCard = useCallback((drawnCard: DrawnCard) => {
     setSelectedCard(drawnCard)
-  }
+  }, [])
 
-  const updateCardReversed = (cardId: number, isReversed: boolean) => {
-    setDrawnCards(drawnCards.map((dc: DrawnCard) => 
+  const updateCardReversed = useCallback((cardId: number, isReversed: boolean) => {
+    setDrawnCards((prev) => prev.map((dc: DrawnCard) => 
       dc.card.id === cardId ? { ...dc, isReversed } : dc
     ))
-    if (selectedCard && selectedCard.card.id === cardId) {
-      setSelectedCard({ ...selectedCard, isReversed })
-    }
-    if (threeCardReading) {
-      setThreeCardReading(threeCardReading.map((dc: DrawnCard) =>
-        dc.card.id === cardId ? { ...dc, isReversed } : dc
-      ))
-    }
-  }
+    setSelectedCard((prev) => {
+      if (prev && prev.card.id === cardId) {
+        return { ...prev, isReversed }
+      }
+      return prev
+    })
+    setThreeCardReading((prev) => {
+      if (prev) {
+        return prev.map((dc: DrawnCard) =>
+          dc.card.id === cardId ? { ...dc, isReversed } : dc
+        )
+      }
+      return prev
+    })
+  }, [])
 
-  const handleSelectCardFromBrowser = (card: TarotCard) => {
+  const handleSelectCardFromBrowser = useCallback((card: TarotCard) => {
     const drawnCard: DrawnCard = { card, isReversed: false }
     setSelectedCard(drawnCard)
     setThreeCardReading(null)
     setViewingHistoryReading(null)
-  }
+  }, [])
 
-  const handleViewHistoryReading = (reading: ReadingRecord) => {
+  const handleViewHistoryReading = useCallback((reading: ReadingRecord) => {
     setViewingHistoryReading(reading)
     if (reading.type === 'single') {
       setSelectedCard(reading.cards[0])
@@ -319,21 +324,26 @@ function App() {
     }
     // 滚动到顶部
     window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  }, [])
 
-  const handleDeleteHistoryReading = (id: string) => {
+  const handleDeleteHistoryReading = useCallback((id: string) => {
     if (confirm('确定要删除这条占卜记录吗？')) {
-      setReadingHistory(readingHistory.filter(r => r.id !== id))
+      setReadingHistory(prev => prev.filter(r => r.id !== id))
     }
-  }
+  }, [])
 
-  const handleExportReading = (reading: ReadingRecord) => {
+  const handleExportReading = useCallback((reading: ReadingRecord) => {
     downloadReading(reading)
-  }
+  }, [])
 
-  const handleShareReading = async (reading: ReadingRecord) => {
+  const handleShareReading = useCallback(async (reading: ReadingRecord) => {
     await shareReading(reading)
-  }
+  }, [])
+
+  // 统一的返回函数，避免重复创建
+  const handleBackToTarot = useCallback(() => {
+    setCurrentPage('tarot')
+  }, [])
 
   // 获取所有功能列表 - 使用 useMemo 缓存，避免每次渲染都重新创建
   const features = useMemo(() => {
@@ -705,35 +715,35 @@ function App() {
       <main className="app-main">
         <Suspense fallback={<div className="loading-fallback">加载中...</div>}>
           {currentPage === 'name' ? (
-            <NameGenerator onBack={() => setCurrentPage('tarot')} />
+            <NameGenerator onBack={handleBackToTarot} />
           ) : currentPage === 'horoscope' ? (
-            <Horoscope onBack={() => setCurrentPage('tarot')} />
+            <Horoscope onBack={handleBackToTarot} />
           ) : currentPage === 'almanac' ? (
-            <Almanac onBack={() => setCurrentPage('tarot')} />
+            <Almanac onBack={handleBackToTarot} />
           ) : currentPage === 'cybermerit' ? (
-            <CyberMerit onBack={() => setCurrentPage('tarot')} />
+            <CyberMerit onBack={handleBackToTarot} />
           ) : currentPage === 'bazi' ? (
-            <BaziFortune onBack={() => setCurrentPage('tarot')} />
+            <BaziFortune onBack={handleBackToTarot} />
           ) : currentPage === 'divination' ? (
-            <DivinationDraw onBack={() => setCurrentPage('tarot')} />
+            <DivinationDraw onBack={handleBackToTarot} />
           ) : currentPage === 'dream' ? (
-            <DreamInterpretation onBack={() => setCurrentPage('tarot')} />
+            <DreamInterpretation onBack={handleBackToTarot} />
           ) : currentPage === 'fengshui' ? (
-            <FengshuiCompass onBack={() => setCurrentPage('tarot')} />
+            <FengshuiCompass onBack={handleBackToTarot} />
           ) : currentPage === 'auspicious' ? (
-            <AuspiciousDate onBack={() => setCurrentPage('tarot')} />
+            <AuspiciousDate onBack={handleBackToTarot} />
           ) : currentPage === 'numberenergy' ? (
-            <NumberEnergy onBack={() => setCurrentPage('tarot')} />
+            <NumberEnergy onBack={handleBackToTarot} />
           ) : currentPage === 'luckycolor' ? (
-            <LuckyColor onBack={() => setCurrentPage('tarot')} />
+            <LuckyColor onBack={handleBackToTarot} />
           ) : currentPage === 'qimen' ? (
-            <QimenDunjia onBack={() => setCurrentPage('tarot')} />
+            <QimenDunjia onBack={handleBackToTarot} />
           ) : currentPage === 'nametest' ? (
-            <NameTest onBack={() => setCurrentPage('tarot')} />
+            <NameTest onBack={handleBackToTarot} />
           ) : currentPage === 'ziwei' ? (
-            <ZiweiDoushu onBack={() => setCurrentPage('tarot')} />
+            <ZiweiDoushu onBack={handleBackToTarot} />
           ) : currentPage === 'shengxiao' ? (
-            <ShengxiaoPairing onBack={() => setCurrentPage('tarot')} />
+            <ShengxiaoPairing onBack={handleBackToTarot} />
           ) : (
           <>
         {/* 单张牌抽牌动画 */}

@@ -145,17 +145,25 @@ function DreamInterpretation({ onBack }: DreamInterpretationProps) {
               className="dream-interpret-btn"
               onClick={handleInterpret}
               disabled={isInterpreting || !dreamContent.trim()}
+              aria-label="开始解析梦境"
+              aria-busy={isInterpreting}
             >
               {isInterpreting ? '解析中...' : '🔮 开始解析'}
             </button>
             {dreamContent && (
-              <button className="dream-clear-btn" onClick={handleClear}>
+              <button 
+                className="dream-clear-btn" 
+                onClick={handleClear}
+                aria-label="清空输入内容"
+              >
                 清空
               </button>
             )}
             <button
               className="dream-history-btn"
               onClick={() => setShowHistory(!showHistory)}
+              aria-label={showHistory ? '隐藏历史记录' : '查看历史记录'}
+              aria-expanded={showHistory}
             >
               {showHistory ? '📝 隐藏历史' : '📚 查看历史'}
             </button>

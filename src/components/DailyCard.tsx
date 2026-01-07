@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { TarotCard } from '../data/tarotCards'
 import { tarotCards } from '../data/tarotCards'
 import CardDisplay from './CardDisplay'
-import { logger } from '../utils/logger'
+import { getStorageItem, setStorageItem } from '../utils/storage'
 import './DailyCard.css'
 
 interface DailyCardProps {
@@ -34,18 +34,11 @@ function DailyCard({ onSelectCard }: DailyCardProps) {
 
     // 检查今天是否已经查看过
     const todayKey = getTodayKey()
-    const saved = localStorage.getItem(DAILY_CARD_STORAGE_KEY)
-    if (saved) {
-      try {
-        const data = JSON.parse(saved)
-        if (data.date === todayKey) {
-          setShowCard(true)
-          setHasViewedToday(true)
-          setIsReversed(data.isReversed || reversed)
-        }
-      } catch (e) {
-        logger.error('Failed to load daily card state', e)
-      }
+    const result = getStorageItem<{ date: string; isReversed: boolean }>(DAILY_CARD_STORAGE_KEY)
+    if (result.success && result.data && result.data.date === todayKey) {
+      setShowCard(true)
+      setHasViewedToday(true)
+      setIsReversed(result.data.isReversed || reversed)
     }
   }, [])
 
@@ -59,10 +52,10 @@ function DailyCard({ onSelectCard }: DailyCardProps) {
     
     // 保存查看状态到localStorage
     const todayKey = getTodayKey()
-    localStorage.setItem(DAILY_CARD_STORAGE_KEY, JSON.stringify({
+    setStorageItem(DAILY_CARD_STORAGE_KEY, {
       date: todayKey,
       isReversed: isReversed
-    }))
+    })
   }
 
   return (

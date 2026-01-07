@@ -3,6 +3,7 @@ import { TarotCard } from '../data/tarotCards'
 import { tarotCards } from '../data/tarotCards'
 import { getCardIcon, getSuitIcon } from '../utils/cardIcons'
 import { toggleFavorite } from '../utils/favorites'
+import { getStorageItem } from '../utils/storage'
 import './CardBrowser.css'
 
 interface CardBrowserProps {
@@ -17,12 +18,8 @@ function CardBrowser({ onSelectCard }: CardBrowserProps) {
 
   useEffect(() => {
     const updateFavorites = () => {
-      try {
-        const saved = localStorage.getItem('tarot-favorites')
-        setFavorites(saved ? JSON.parse(saved) : [])
-      } catch {
-        setFavorites([])
-      }
+      const result = getStorageItem<number[]>('tarot-favorites', [])
+      setFavorites(result.success && result.data ? result.data : [])
     }
     updateFavorites()
     

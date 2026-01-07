@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import './CyberMerit.css'
 import muyuSound from '../video/muyu-2.mp3?url'
 import { logger } from '../utils/logger'
+import { getStorageItem, setStorageItem } from '../utils/storage'
 
 interface CyberMeritProps {
   onBack?: () => void
@@ -46,20 +47,30 @@ function CyberMerit({ onBack: _onBack }: CyberMeritProps) {
 
   // 从localStorage加载数据
   useEffect(() => {
-    const savedWoodfish = localStorage.getItem('cyber-woodfish-count')
-    const savedRelease = localStorage.getItem('cyber-release-count')
-    const savedIncense = localStorage.getItem('cyber-incense-count')
-    const savedPrayer = localStorage.getItem('cyber-prayer-count')
+    const woodfishResult = getStorageItem<number>('cyber-woodfish-count', 0)
+    if (woodfishResult.success && woodfishResult.data) {
+      setWoodfishCount(woodfishResult.data)
+    }
     
-    if (savedWoodfish) setWoodfishCount(parseInt(savedWoodfish))
-    if (savedRelease) setReleaseCount(parseInt(savedRelease))
-    if (savedIncense) setIncenseCount(parseInt(savedIncense))
-    if (savedPrayer) setPrayerCount(parseInt(savedPrayer))
+    const releaseResult = getStorageItem<number>('cyber-release-count', 0)
+    if (releaseResult.success && releaseResult.data) {
+      setReleaseCount(releaseResult.data)
+    }
+    
+    const incenseResult = getStorageItem<number>('cyber-incense-count', 0)
+    if (incenseResult.success && incenseResult.data) {
+      setIncenseCount(incenseResult.data)
+    }
+    
+    const prayerResult = getStorageItem<number>('cyber-prayer-count', 0)
+    if (prayerResult.success && prayerResult.data) {
+      setPrayerCount(prayerResult.data)
+    }
   }, [])
 
   // 保存数据到localStorage
   const saveCount = (type: GameType, count: number) => {
-    localStorage.setItem(`cyber-${type}-count`, count.toString())
+    setStorageItem(`cyber-${type}-count`, count)
   }
 
   // 添加浮动文字

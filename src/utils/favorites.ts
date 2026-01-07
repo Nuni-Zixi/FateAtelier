@@ -1,28 +1,25 @@
 import { TarotCard } from '../data/tarotCards'
+import { getStorageItem, setStorageItem } from './storage'
 
 const FAVORITES_KEY = 'tarot-favorites'
 
 export const getFavorites = (): number[] => {
-  try {
-    const saved = localStorage.getItem(FAVORITES_KEY)
-    return saved ? JSON.parse(saved) : []
-  } catch {
-    return []
-  }
+  const result = getStorageItem<number[]>(FAVORITES_KEY, [])
+  return result.success && result.data ? result.data : []
 }
 
 export const addFavorite = (cardId: number): void => {
   const favorites = getFavorites()
   if (!favorites.includes(cardId)) {
     favorites.push(cardId)
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites))
+    setStorageItem(FAVORITES_KEY, favorites)
   }
 }
 
 export const removeFavorite = (cardId: number): void => {
   const favorites = getFavorites()
   const updated = favorites.filter(id => id !== cardId)
-  localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated))
+  setStorageItem(FAVORITES_KEY, updated)
 }
 
 export const isFavorite = (cardId: number): boolean => {
