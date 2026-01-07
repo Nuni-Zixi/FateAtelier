@@ -1,0 +1,22 @@
+{
+  "name": "命运工坊",
+  "short_name": "命运工坊",
+  "description": "一个精美的综合占卜与命理 Web 应用",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["lifestyle", "entertainment"],
+  "lang": "zh-CN",
+  "dir": "ltr"
+}
+

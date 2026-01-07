@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './NameGenerator.css'
+import { toast } from '../utils/toast'
 
 interface NameGeneratorProps {
   onBack: () => void
@@ -31,7 +32,7 @@ function NameGenerator({ onBack }: NameGeneratorProps) {
 
   const generateNames = async () => {
     if (!surname.trim()) {
-      alert('请输入姓氏')
+      toast.warning('请输入姓氏')
       return
     }
 
@@ -55,11 +56,11 @@ function NameGenerator({ onBack }: NameGeneratorProps) {
         setGeneratedNames(names)
       } else {
         console.warn('生成的名字列表为空')
-        alert('生成名字失败，请重试')
+        toast.error('生成名字失败，请重试')
       }
     } catch (error) {
       console.error('生成名字失败:', error)
-      alert('生成名字失败，请重试')
+      toast.error('生成名字失败，请重试')
       // 确保即使出错也重置状态
       setGeneratedNames([])
     } finally {
@@ -1419,9 +1420,9 @@ function NameGenerator({ onBack }: NameGeneratorProps) {
 
   const copyName = (name: string) => {
     navigator.clipboard.writeText(name).then(() => {
-      alert(`已复制：${name}`)
+      toast.success(`已复制：${name}`)
     }).catch(() => {
-      alert('复制失败，请手动复制')
+      toast.error('复制失败，请手动复制')
     })
   }
 

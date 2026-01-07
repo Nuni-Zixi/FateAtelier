@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { interpretDream, DreamSymbol } from '../data/dreamSymbols'
 import './DreamInterpretation.css'
+import { toast } from '../utils/toast'
 
 interface DreamInterpretationProps {
   onBack?: () => void
@@ -49,7 +50,7 @@ function DreamInterpretation({ onBack }: DreamInterpretationProps) {
 
   const handleInterpret = () => {
     if (!dreamContent.trim()) {
-      alert('请输入梦境内容')
+      toast.warning('请输入梦境内容')
       return
     }
 

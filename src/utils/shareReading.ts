@@ -1,4 +1,5 @@
 import { ReadingRecord } from '../components/ReadingHistory'
+import { toast } from '../utils/toast'
 
 export const shareReading = async (reading: ReadingRecord): Promise<void> => {
   const text = generateShareText(reading)
@@ -48,7 +49,7 @@ const generateShareText = (reading: ReadingRecord): string => {
 const copyToClipboard = (text: string): void => {
   if (navigator.clipboard) {
     navigator.clipboard.writeText(text).then(() => {
-      alert('占卜结果已复制到剪贴板！')
+      toast.success('占卜结果已复制到剪贴板！')
     }).catch(() => {
       fallbackCopy(text)
     })
@@ -66,9 +67,9 @@ const fallbackCopy = (text: string): void => {
   textArea.select()
   try {
     document.execCommand('copy')
-    alert('占卜结果已复制到剪贴板！')
+    toast.success('占卜结果已复制到剪贴板！')
   } catch (err) {
-    alert('复制失败，请手动复制')
+    toast.error('复制失败，请手动复制')
   }
   document.body.removeChild(textArea)
 }

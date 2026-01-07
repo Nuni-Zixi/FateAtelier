@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './BaziFortune.css'
+import { toast } from '../utils/toast'
 
 interface BaziFortuneProps {
   onBack?: () => void
@@ -675,18 +676,18 @@ function BaziFortune({ onBack }: BaziFortuneProps) {
 
     if (calendarType === 'solar') {
       if (!birthDate) {
-        alert('请输入出生日期')
+        toast.warning('请输入出生日期')
         return
       }
       date = new Date(birthDate)
       if (isNaN(date.getTime())) {
-        alert('请输入有效的日期')
+        toast.error('请输入有效的日期')
         return
       }
     } else {
       // 农历
       if (!lunarYear || !lunarMonth || !lunarDay) {
-        alert('请完整输入农历日期')
+        toast.warning('请完整输入农历日期')
         return
       }
 
@@ -695,12 +696,12 @@ function BaziFortune({ onBack }: BaziFortuneProps) {
       const day = parseInt(lunarDay)
 
       if (isNaN(year) || isNaN(month) || isNaN(day)) {
-        alert('请输入有效的日期')
+        toast.error('请输入有效的日期')
         return
       }
 
       if (year < 1900 || year > 2100) {
-        alert('请输入1900-2100年之间的日期')
+        toast.warning('请输入1900-2100年之间的日期')
         return
       }
 
@@ -708,7 +709,7 @@ function BaziFortune({ onBack }: BaziFortuneProps) {
       const solarDate = lunarToSolar(year, lunarMonthParam, day)
       
       if (!solarDate) {
-        alert('农历日期转换失败，可能原因：\n1. 日期超出支持范围（1900-2100年）\n2. 输入的日期无效\n3. 该年没有对应的农历月份\n\n请检查输入的日期是否正确。')
+        toast.error('农历日期转换失败，可能原因：\n1. 日期超出支持范围（1900-2100年）\n2. 输入的日期无效\n3. 该年没有对应的农历月份\n\n请检查输入的日期是否正确。')
         return
       }
       
@@ -716,7 +717,7 @@ function BaziFortune({ onBack }: BaziFortuneProps) {
     }
 
     if (!date) {
-      alert('日期计算失败')
+      toast.error('日期计算失败')
       return
     }
 
@@ -727,7 +728,7 @@ function BaziFortune({ onBack }: BaziFortuneProps) {
     const hourPillar = calculateHourPillar(dayPillar, birthTime)
 
     if (!hourPillar) {
-      alert('请选择出生时辰')
+      toast.warning('请选择出生时辰')
       return
     }
 

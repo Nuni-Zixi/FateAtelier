@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import './Horoscope.css'
+import { toast } from '../utils/toast'
 
 type Period = 'today' | 'week' | 'month'
 type CalendarType = 'solar' | 'lunar'
@@ -522,7 +523,7 @@ function Horoscope({ onBack: _onBack }: HoroscopeProps) {
   // 根据生日查询星座
   const handleQueryByBirthday = () => {
     if (!birthYear || !birthMonth || !birthDay) {
-      alert('请完整输入生日信息')
+      toast.warning('请完整输入生日信息')
       return
     }
 
@@ -531,12 +532,12 @@ function Horoscope({ onBack: _onBack }: HoroscopeProps) {
     const day = parseInt(birthDay)
 
     if (isNaN(year) || isNaN(month) || isNaN(day)) {
-      alert('请输入有效的日期')
+      toast.error('请输入有效的日期')
       return
     }
 
     if (month < 1 || month > 12 || day < 1 || day > 31) {
-      alert('请输入有效的日期范围')
+      toast.warning('请输入有效的日期范围')
       return
     }
 
@@ -545,7 +546,7 @@ function Horoscope({ onBack: _onBack }: HoroscopeProps) {
       const calculatedSign = getZodiacSignByDate(month, day)
       setSignIndex(calculatedSign)
       setShowBirthInput(false)
-      alert(`根据您的生日，您的星座是：${zodiacSigns[calculatedSign].icon} ${zodiacSigns[calculatedSign].name}`)
+      toast.success(`根据您的生日，您的星座是：${zodiacSigns[calculatedSign].icon} ${zodiacSigns[calculatedSign].name}`)
     } else {
       // 农历转阳历
       const lunarMonthParam = isLunarLeapMonth ? month + 12 : month
@@ -556,10 +557,10 @@ function Horoscope({ onBack: _onBack }: HoroscopeProps) {
         setShowBirthInput(false)
         const solarMonth = solarDate.getMonth() + 1
         const solarDay = solarDate.getDate()
-        alert(`根据您的农历生日（${year}年${isLunarLeapMonth ? '闰' : ''}${month}月${day}日），对应的阳历是${solarDate.getFullYear()}年${solarMonth}月${solarDay}日，您的星座是：${zodiacSigns[calculatedSign].icon} ${zodiacSigns[calculatedSign].name}`)
+        toast.success(`根据您的农历生日（${year}年${isLunarLeapMonth ? '闰' : ''}${month}月${day}日），对应的阳历是${solarDate.getFullYear()}年${solarMonth}月${solarDay}日，您的星座是：${zodiacSigns[calculatedSign].icon} ${zodiacSigns[calculatedSign].name}`)
       } else {
         // 转换失败，可能是日期无效或超出支持范围
-        alert('农历日期转换失败，可能原因：\n1. 日期超出支持范围（1900-2100年）\n2. 输入的日期无效（如2月30日）\n3. 该年没有对应的农历月份\n\n建议：请检查输入的日期是否正确，或直接选择您的星座查看运势。')
+        toast.error('农历日期转换失败，可能原因：\n1. 日期超出支持范围（1900-2100年）\n2. 输入的日期无效（如2月30日）\n3. 该年没有对应的农历月份\n\n建议：请检查输入的日期是否正确，或直接选择您的星座查看运势。')
       }
     }
   }

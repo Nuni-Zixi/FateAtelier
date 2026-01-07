@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { getStrokeCount, getTotalStrokeCount } from '../data/strokeCount'
 import './NameTest.css'
+import { toast } from '../utils/toast'
 
 interface NameTestProps {
   onBack?: () => void
@@ -295,7 +296,7 @@ function NameTest({ onBack }: NameTestProps) {
   // 测试姓名
   const testName = () => {
     if (!surname.trim() || !givenName.trim()) {
-      alert('请输入完整的姓名（姓氏和名字）')
+      toast.warning('请输入完整的姓名（姓氏和名字）')
       return
     }
     

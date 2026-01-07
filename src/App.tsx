@@ -12,6 +12,7 @@ import Favorites from './components/Favorites'
 import CardDrawAnimation from './components/CardDrawAnimation'
 import ThreeCardDrawAnimation from './components/ThreeCardDrawAnimation'
 import ReadingTypeSelector from './components/ReadingTypeSelector'
+import ToastContainer from './components/ToastContainer'
 // import WeatherEffect, { WeatherType } from './components/WeatherEffect'
 // 动态导入大型功能组件
 const NameGenerator = lazy(() => import('./components/NameGenerator'))
@@ -36,6 +37,7 @@ import { shareReading } from './utils/shareReading'
 import { downloadAllData } from './utils/exportData'
 import { DrawnCard } from './types'
 import { ReadingType } from './types/reading'
+import { toast } from './utils/toast'
 import './App.css'
 
 // const CAROUSEL_EFFECTS = ['mystic', 'sparkle', 'glow', 'fade', 'swirl', 'zoom', 'flip', 'warp'] as const
@@ -154,7 +156,7 @@ function App() {
 
   const drawCard = () => {
     if (drawnCards.length >= 78) {
-      alert('所有牌都已抽取完毕！')
+      toast.info('所有牌都已抽取完毕！')
       return
     }
 
@@ -163,7 +165,7 @@ function App() {
     )
     
     if (availableCards.length === 0) {
-      alert('没有可用的牌了！')
+      toast.info('没有可用的牌了！')
       return
     }
     
@@ -200,7 +202,7 @@ function App() {
 
   const drawThreeCards = () => {
     if (drawnCards.length + 3 > 78) {
-      alert('剩余的牌不足以抽取三张！')
+      toast.warning('剩余的牌不足以抽取三张！')
       return
     }
     // 先显示占卜类型选择器
@@ -929,6 +931,7 @@ function App() {
           </div>
         </div>
       </footer>
+      <ToastContainer />
       <Analytics />
     </div>
   )

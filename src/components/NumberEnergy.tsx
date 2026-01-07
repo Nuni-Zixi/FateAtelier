@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import './NumberEnergy.css'
+import { toast } from '../utils/toast'
 
 interface NumberEnergyProps {
   onBack: () => void
@@ -464,7 +465,7 @@ function NumberEnergy({ onBack }: NumberEnergyProps) {
       setCopiedText(text)
       setTimeout(() => setCopiedText(null), 2000)
     } catch (err) {
-      alert('复制失败，请手动复制')
+      toast.error('复制失败，请手动复制')
     }
   }
 

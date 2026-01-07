@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './ShengxiaoPairing.css'
+import { toast } from '../utils/toast'
 
 interface ShengxiaoPairingProps {
   onBack?: () => void
@@ -179,7 +180,7 @@ function ShengxiaoPairing({ onBack }: ShengxiaoPairingProps) {
 
   const handlePairing = () => {
     if (!shengxiao1 || !shengxiao2) {
-      alert('请选择两个生肖')
+      toast.warning('请选择两个生肖')
       return
     }
 

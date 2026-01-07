@@ -3,6 +3,7 @@ import './ZiweiDoushu.css'
 import { lunarToSolar, solarToLunar } from '../utils/lunarCalendar'
 import { calculateYearPillar, calculateDayPillar } from '../utils/bazi'
 import { tiangan, dizhi } from '../utils/constants'
+import { toast } from '../utils/toast'
 
 interface ZiweiDoushuProps {
   onBack?: () => void
@@ -475,19 +476,19 @@ function ZiweiDoushu({ onBack }: ZiweiDoushuProps) {
 
     if (calendarType === 'solar') {
       if (!birthDate) {
-        alert('请输入出生日期')
+        toast.warning('请输入出生日期')
         return
       }
       date = new Date(birthDate)
       if (isNaN(date.getTime())) {
-        alert('请输入有效的日期')
+        toast.error('请输入有效的日期')
         return
       }
       
       // 使用完整的阳历转农历算法
       const lunar = solarToLunar(date)
       if (!lunar) {
-        alert('阳历转农历失败，请检查输入的日期是否正确（支持1900-2100年）')
+        toast.error('阳历转农历失败，请检查输入的日期是否正确（支持1900-2100年）')
         return
       }
       actualLunarYear = lunar.year
@@ -496,7 +497,7 @@ function ZiweiDoushu({ onBack }: ZiweiDoushuProps) {
       isLeapMonth = lunar.isLeapMonth
     } else {
       if (!lunarYear || !lunarMonth || !lunarDay) {
-        alert('请完整输入农历日期')
+        toast.warning('请完整输入农历日期')
         return
       }
 
@@ -505,12 +506,12 @@ function ZiweiDoushu({ onBack }: ZiweiDoushuProps) {
       const day = parseInt(lunarDay)
 
       if (isNaN(year) || isNaN(month) || isNaN(day)) {
-        alert('请输入有效的日期')
+        toast.error('请输入有效的日期')
         return
       }
 
       if (year < 1900 || year > 2100) {
-        alert('请输入1900-2100年之间的日期')
+        toast.warning('请输入1900-2100年之间的日期')
         return
       }
 
@@ -523,7 +524,7 @@ function ZiweiDoushu({ onBack }: ZiweiDoushuProps) {
       const solarDate = lunarToSolar(year, lunarMonthParam, day)
       
       if (!solarDate) {
-        alert('农历日期转换失败，请检查输入的日期是否正确。')
+        toast.error('农历日期转换失败，请检查输入的日期是否正确。')
         return
       }
       
@@ -531,7 +532,7 @@ function ZiweiDoushu({ onBack }: ZiweiDoushuProps) {
     }
 
     if (!date) {
-      alert('日期计算失败')
+      toast.error('日期计算失败')
       return
     }
 

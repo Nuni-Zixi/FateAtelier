@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from 'react'
 import './LuckyColor.css'
 import { tianganWuxing, dizhiToShengxiao } from '../utils/constants'
 import { lunarToSolar } from '../utils/lunarCalendar'
+import { toast } from '../utils/toast'
 import { calculateYearPillar, calculateMonthPillar, calculateDayPillar, analyzeWuxingFromBazi } from '../utils/bazi'
 
 interface LuckyColorProps {
@@ -634,7 +635,7 @@ function LuckyColor({ onBack: _onBack }: LuckyColorProps) {
       setCopiedHex(type)
       setTimeout(() => setCopiedHex(null), 2000)
     } catch (err) {
-      alert('复制失败，请手动复制')
+      toast.error('复制失败，请手动复制')
     }
   }
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ReadingType, readingTypes } from '../types/reading'
 import './ReadingTypeSelector.css'
+import { toast } from '../utils/toast'
 
 interface ReadingTypeSelectorProps {
   onSelect: (type: ReadingType, customQuestion?: string) => void
@@ -25,7 +26,7 @@ function ReadingTypeSelector({ onSelect, onCancel }: ReadingTypeSelectorProps) {
   const handleConfirm = () => {
     if (selectedType) {
       if (selectedType === 'custom' && !customQuestion.trim()) {
-        alert('请输入您的问题')
+        toast.warning('请输入您的问题')
         return
       }
       onSelect(selectedType, selectedType === 'custom' ? customQuestion : undefined)
