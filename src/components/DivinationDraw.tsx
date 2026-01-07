@@ -2,7 +2,8 @@ import { useState, useEffect, useMemo } from 'react'
 import { divinationSticks, DivinationStick } from '../data/divinationSticks'
 import { optimizeStick } from '../utils/divinationOptimizer'
 import './DivinationDraw.css'
-import { logger } from '../utils/logger'
+import { getStorageItem, setStorageItem } from '../utils/storage'
+import { toast } from '../utils/toast'
 
 interface DivinationDrawProps {
   onBack?: () => void
@@ -29,36 +30,38 @@ function DivinationDraw({ onBack }: DivinationDrawProps) {
 
   // 从localStorage加载历史记录和收藏
   useEffect(() => {
-    const saved = localStorage.getItem('divination-draw-history')
-    if (saved) {
-      try {
-        setDrawHistory(JSON.parse(saved))
-      } catch (e) {
-        logger.error('Failed to load draw history', e)
-      }
+    const historyResult = getStorageItem<DrawHistory[]>('divination-draw-history', [])
+    if (historyResult.success && historyResult.data) {
+      setDrawHistory(historyResult.data)
+    } else if (historyResult.error) {
+      toast.error('加载历史记录失败')
     }
     
-    const savedFavorites = localStorage.getItem('divination-favorites')
-    if (savedFavorites) {
-      try {
-        setFavorites(new Set(JSON.parse(savedFavorites)))
-      } catch (e) {
-        logger.error('Failed to load favorites', e)
-      }
+    const favoritesResult = getStorageItem<number[]>('divination-favorites', [])
+    if (favoritesResult.success && favoritesResult.data) {
+      setFavorites(new Set(favoritesResult.data))
+    } else if (favoritesResult.error) {
+      toast.error('加载收藏失败')
     }
   }, [])
 
   // 保存历史记录到localStorage
   useEffect(() => {
     if (drawHistory.length > 0) {
-      localStorage.setItem('divination-draw-history', JSON.stringify(drawHistory))
+      const result = setStorageItem('divination-draw-history', drawHistory)
+      if (!result.success && result.error) {
+        toast.warning(result.error || '保存历史记录失败')
+      }
     }
   }, [drawHistory])
 
   // 保存收藏到localStorage
   useEffect(() => {
     if (favorites.size > 0) {
-      localStorage.setItem('divination-favorites', JSON.stringify(Array.from(favorites)))
+      const result = setStorageItem('divination-favorites', Array.from(favorites))
+      if (!result.success && result.error) {
+        toast.warning(result.error || '保存收藏失败')
+      }
     }
   }, [favorites])
 
@@ -162,8 +165,8 @@ ${optimizedStick.advice}${optimizedStick.story ? `\n\n戏文简介：\n${optimiz
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    }).catch(err => {
-      logger.error('Failed to copy:', err)
+    }).catch(() => {
+      // 复制失败，静默处理
     })
   }
 
@@ -180,7 +183,7 @@ ${optimizedStick.advice}${optimizedStick.story ? `\n\n戏文简介：\n${optimiz
           text: text
         })
       } catch (err) {
-        logger.error('Share failed:', err)
+        // 分享失败，静默处理
       }
     } else {
       // 降级到复制

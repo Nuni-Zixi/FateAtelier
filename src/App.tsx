@@ -38,7 +38,7 @@ import { downloadAllData } from './utils/exportData'
 import { DrawnCard } from './types'
 import { ReadingType } from './types/reading'
 import { toast } from './utils/toast'
-import { logger } from './utils/logger'
+import { getStorageItem, setStorageItem } from './utils/storage'
 import './App.css'
 
 // const CAROUSEL_EFFECTS = ['mystic', 'sparkle', 'glow', 'fade', 'swirl', 'zoom', 'flip', 'warp'] as const
@@ -127,20 +127,21 @@ function App() {
 
   // 从localStorage加载历史记录
   useEffect(() => {
-    const saved = localStorage.getItem('tarot-reading-history')
-    if (saved) {
-      try {
-        setReadingHistory(JSON.parse(saved))
-      } catch (e) {
-        logger.error('Failed to load reading history', e)
-      }
+    const result = getStorageItem<ReadingRecord[]>('tarot-reading-history', [])
+    if (result.success && result.data) {
+      setReadingHistory(result.data)
+    } else if (result.error) {
+      toast.error('加载历史记录失败')
     }
   }, [])
 
   // 保存历史记录到localStorage
   useEffect(() => {
     if (readingHistory.length > 0) {
-      localStorage.setItem('tarot-reading-history', JSON.stringify(readingHistory))
+      const result = setStorageItem('tarot-reading-history', readingHistory)
+      if (!result.success && result.error) {
+        toast.warning(result.error || '保存历史记录失败')
+      }
     }
   }, [readingHistory])
 

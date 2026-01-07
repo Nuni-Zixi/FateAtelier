@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { interpretDream, DreamSymbol } from '../data/dreamSymbols'
 import './DreamInterpretation.css'
 import { toast } from '../utils/toast'
-import { logger } from '../utils/logger'
+import { getStorageItem, setStorageItem } from '../utils/storage'
 
 interface DreamInterpretationProps {
   onBack?: () => void
@@ -32,20 +32,21 @@ function DreamInterpretation({ onBack }: DreamInterpretationProps) {
 
   // 从localStorage加载历史记录
   useEffect(() => {
-    const saved = localStorage.getItem('dream-interpretation-history')
-    if (saved) {
-      try {
-        setHistory(JSON.parse(saved))
-      } catch (e) {
-        logger.error('Failed to load dream history', e)
-      }
+    const result = getStorageItem<DreamRecord[]>('dream-interpretation-history', [])
+    if (result.success && result.data) {
+      setHistory(result.data)
+    } else if (result.error) {
+      toast.error('加载历史记录失败')
     }
   }, [])
 
   // 保存历史记录到localStorage
   useEffect(() => {
     if (history.length > 0) {
-      localStorage.setItem('dream-interpretation-history', JSON.stringify(history))
+      const result = setStorageItem('dream-interpretation-history', history)
+      if (!result.success && result.error) {
+        toast.warning(result.error || '保存历史记录失败')
+      }
     }
   }, [history])
 
