@@ -976,7 +976,7 @@ function App() {
             <a 
               href="mailto:xuqingxiao61@gmail.com" 
               className="contact-email"
-              aria-label="Ciallo～(∠・ω )⌒☆"
+              aria-label="KawaiiNe"
             >
               📧 xuqingxiao61@gmail.com
             </a>
