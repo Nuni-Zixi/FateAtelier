@@ -958,7 +958,7 @@ function App() {
           onExportAll={() => downloadAllData(readingHistory)}
         />
 
-        {/* 统计信息 */}
+{/* 统计信息 */}
         <Statistics readings={readingHistory} />
           </>
           )}
@@ -970,6 +970,7 @@ function App() {
           <p className="footer-copyright">© 2025 命运工坊 - 仅供娱乐参考</p>
         </div>
       </footer>
+
       <ToastContainer />
       <ConfirmDialogContainer />
       <Analytics />
