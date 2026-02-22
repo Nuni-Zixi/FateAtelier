@@ -958,7 +958,7 @@ function App() {
           onExportAll={() => downloadAllData(readingHistory)}
         />
 
-{/* 统计信息 */}
+        {/* 统计信息 */}
         <Statistics readings={readingHistory} />
           </>
           )}
@@ -968,9 +968,21 @@ function App() {
       <footer className="app-footer">
         <div className="footer-content">
           <p className="footer-copyright">© 2025 命运工坊 - 仅供娱乐参考</p>
+          <div className="footer-team">
+            <p className="team-label">Made with ❤️ by</p>
+            <p className="team-name">Lisa</p>
+          </div>
+          <div className="footer-contact">
+            <a 
+              href="mailto:xuqingxiao61@gmail.com" 
+              className="contact-email"
+              aria-label="Ciallo～(∠・ω )⌒☆"
+            >
+              📧 xuqingxiao61@gmail.com
+            </a>
+          </div>
         </div>
       </footer>
-
       <ToastContainer />
       <ConfirmDialogContainer />
       <Analytics />
@@ -979,4 +991,3 @@ function App() {
 }
 
 export default App
-
